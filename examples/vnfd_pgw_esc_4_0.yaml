@@ -1,0 +1,904 @@
+tosca_definitions_version: tosca_simple_profile_for_nfv_1_0_0
+# ETSI/Tosca Documentation references:
+#   - SOL001:   SOL001v003000
+#   - ToscaNFV: tosca-nfv-v1.0-csd04
+#   - ToscaSP:  TOSCA-Simple-Profile-YAML-v1.0-csprd01
+#   - IFA011:   IFA011v020101p
+
+# Author: Tony Clayton <anclayto@cisco.com> (CiscoESC)
+#!!!! NOTES FOR REVIEWERS !!!!
+# I have heavily commented this file, using the following convention:
+# - Comments beginning with:
+#       # SOL001
+#   or:
+#       # SOL001; IFA011
+#   indicate that we believe it is compliant with the mentioned SPEC(s),
+#   without much room for interpretation (high-level of confidence).
+# - Comments beginning with:
+#      # SOL001...ToscaNFV
+#   indicate that it is compliant with SOL001 indirectly, since SOL001 explicitly defers
+#   to ToscaNFV spec.
+# - Comments beginning with:
+#      # CiscoESC
+#   indicate that it is our own extension of the spec in order to fill a gap in functionality.
+
+
+description: VPC VNFD for VZ
+
+metadata: # Tosca Simple Profile - NOTE: There are no mandator metadata properties for Tosca NFV at this time.
+  #ID: NSD-Iperf # Open Baton - NOTE: See VNF node "descriptor_id" property, below.
+  template_name: vnfd_pgw_esc_4_0 # ToscaSP(optional)
+  #vendor: Cisco # Open Baton - NOTE: See VNF node "provider" property, below.
+  #version: 1.0 # Open Baton - NOTE: See VNF node "descriptor_version" property, below.
+
+topology_template:
+###################
+# Template Inputs #
+###################
+  # NOTE: TOSCA inputs and the { get_input: <name> } syntax 
+  #       are defined in ToscaNFV/ToscaSP
+  #       Through Cisco ESC ETSI API, input values are assigned 
+  #       using the following mechanism:
+  #         InstantiateVNFRequest.additionalParams:
+  #           vnfd_inputs:
+  #             <input_name>: <input_value>
+  inputs: # ToscaNFV; ToscaSP
+  
+    #
+    # LCS Policy Properties
+    #
+    CHASSIS_KEY:
+      description: VPC Chassis key
+    
+    #
+    # CF/SF Common Day0 Config Parameters
+    #
+    VNFM_PROXY_ADDRS:
+      description: CF/SF VNFM Proxy Addresses for Day0 Config (staros_param.cfg)
+      
+    #
+    # CF Day0 Config Parameters
+    #
+    CF_STAROS_CONFIG_URL:
+      description: The location (URL) of the staros_config.txt file for CF VDUs
+    CF_STAROS_PARAM_URL:
+      description: The location (URL) of the staros_param.cfg file for CF VDUs
+    CF_DOMAIN_NAME:
+      description: CF Domain Name for Day0 Config (staros_config.txt)
+    CF_NAME_SERVER:
+      description: CF Nameserver for Day0 Config (staros_config.txt)
+    CF_VIP_ADDR:
+      description: CF VIP Address for Day0 Config (staros_config.txt)
+    CF1_SLOT_CARD_NUMBER: 
+      description: CF 1 Slot Card Number for Day0 Config (staros_config.txt, staros_param.cfg)
+    CF2_SLOT_CARD_NUMBER: 
+      description: CF 2 Slot Card Number for Day0 Config (staros_config.txt, staros_param.cfg)
+    CF_CARD_TYPE_NUMBER:
+      description: CF Card Type Number for Day0 Config (staros_param.cfg)
+      
+    #
+    # SF Day0 Config Parameters
+    #
+    SF_STAROS_PARAM_URL:
+      description: The location (URL) of the staros_param.cfg file for SF VDUs
+    SF_CARD_TYPE_NUMBER:
+      description: SF Card Type Number for Day0 Config (staros_param.cfg)
+    SF1_SLOT_CARD_NUMBER:
+      description: SF 1 Slot Card Number for Day0 Config (staros_param.cfg)
+    SF2_SLOT_CARD_NUMBER:
+      description: SF 2 Slot Card Number for Day0 Config (staros_param.cfg)
+
+      
+#########################
+# Substitution Mappings #
+#########################
+# NOTE:  substitution mappings provide a mechanism to create a base template and then derive additional
+#        templates from it.  The derived templates would typically "fill in" missing details.
+#        SOL001 prescribes using substitution mappings as a way to define multiple Deployment Flavours,
+#        such that each Deployment Flavour would have its own template (vnfd) derived from one base vnfd.
+#        Other bindings such as External Virtual Links may also be left unbound in the base vnfd,
+#        and derived vnfd templates may provide custom bindings (substitutions) for these external requirements.
+#
+#  substitution_mappings: # SOL001(optional - to support multiple Deployment Flavours)
+#    node_type: tosca.nodes.nfv.VNF # SOL001
+#    properties: {} # See properties under vnf node template, below
+#    requirements: # SOL001(optional - for external CP/VL support)
+#      #- virtual_link: [ vnf, virtual_link ] # SOL001(required)
+#    capabilities:
+#      #deployment_flavour: [ vnf, deployment_flavour ] # SOL001(optional - unbound to support multiple VnfDf)
+#      deployment_flavour: # SOL001(optional - bound to support single VnfDf)
+#        properties: {} # See deployment_flavour properties under the vnf node template, below
+#    interfaces: # SOL001 - NOTE: still under discussion
+#      Basic: # SOL001 - NOTE: still under discussion
+#        instantiate: # SOL001 - NOTE: still under discussion
+#        terminate: # SOL001 - NOTE: still under discussion
+      
+      
+  node_templates: # SOL001
+#####################
+# VNF configuration #
+#####################
+    vnf:
+      #type: tosca.nodes.nfv.VNF # SOL001
+      type: tosca.nodes.nfv.VNF.CiscoESC # CiscoESC - NOTE: NFVO can strip suffix
+      properties:
+        descriptor_id: 9ee0ce39-cf0a-41ef-b01a-b62b40777901 # SOL001(required) - NOTE: may become vnfd_id from IFA011
+        descriptor_version: 1.0 # SOL001(required) - NOTE: may become vnfd_version from IFA011
+        provider: Cisco # SOL001(required) - NOTE: may become vnf_provider from IFA011
+        product_name: VPC # SOL001(required) - NOTE: may become vnf_product_name from IFA011
+        software_version: 1.0 # SOL001(required) - NOTE: may become vnf_software_version from IFA011
+        product_info_name: 'Virtual Packet Core (VPC)' # SOL001(required) - NOTE: may become vnf_product_info_name from IFA011
+        #product_info_description: none # SOL001(optional)
+        vnfm_info:
+          - 'Cisco ESC'
+        #localization_languages: [] # SOL001(optional)
+        #default_localization_language: # SOL001(optional)
+      requirements: # SOL001(optional - for external CP/VL support)
+        - virtual_link: [ anECP, external_virtual_link ] # SOL001(0..N)
+      #interfaces: # SOL001 - NOTE: still under discussion
+        #Basic:  # SOL001 - NOTE: still under discussion
+          #instantiate:  # SOL001 - NOTE: still under discussion
+          #terminate:  # SOL001 - NOTE: still under discussion
+      #####################
+      # Deployment Flavor #
+      #####################
+      capabilities:
+        # NOTE: SOL001 contains Deployment Flavour examples that use substitution_mappings.
+        #       In the case that there is only one Deployment Flavour, the following syntax
+        #       should also be valid for specifying the DF without substitution_mappings.
+        #       If there is a need to add additional Deployment Flavours in the future, 
+        #       the VNFD template could be refactored to use substitution_mappings, 
+        #       and the version updated accordingly.
+        deployment_flavour: # SOL001(bound to support single Deployment Flavour)
+          properties:
+            flavour_id: default # SOL001
+            description: 'Default VNF Deployment Flavour' # SOL001
+            vdu_profile: # SOL001; IFA011(1..N)
+              c1: # SOL001; IFA011(required - key)
+                min_number_of_instances: 1 # SOL001; IFA011(required)
+                max_number_of_instances: 1 # SOL001; IFA011(required)
+                affinity_or_anti_affinity_group_ids: [ cf2_aa_group, sf3_aa_group, sf4_aa_group ] # IFA011(optional)
+              c2: # SOL001; IFA011(required - key)
+                min_number_of_instances: 1 # SOL001; IFA011(required)
+                max_number_of_instances: 1 # SOL001; IFA011(required)
+                affinity_or_anti_affinity_group_id: [ cf2_aa_group, sf3_aa_group, sf4_aa_group ] # IFA011(optional)
+              s3: # SOL001; IFA011(required - key)
+                min_number_of_instances: 1 # SOL001; IFA011(required)
+                max_number_of_instances: 1 # SOL001; IFA011(required)
+                affinity_or_anti_affinity_group_id: [ sf3_aa_group, sf4_aa_group ] # IFA011(optional)
+              s4: # SOL001; IFA011(required - key)
+                min_number_of_instances: 1 # SOL001; IFA011(required)
+                max_number_of_instances: 1 # SOL001; IFA011(required)
+                affinity_or_anti_affinity_group_id: [ sf4_aa_group ] # IFA011(optional)
+            #virtual_link_profile: # IFA011(0..N)
+              #data_net: vl_flavor_10GB # SOL001(required) - NOTE: may become map of map? See SOL001
+            instantiation_levels: # SOL001(1..N) - NOTE: This may become tosca.nodes.nfv.InstantiationLevel?
+              #- level_id: default # IFA011(required)
+              default: # SOL001(required - key) NOTE: could be map, or list with level_id, not sure yet
+                description: 'Default Instantiation Level' # SOL001(required)
+                vdu_levels: # SOL001(1..N)
+                  c1: # SOL001(required - key)
+                    number_of_instances: 1 # SOL001(required)
+                  c2: # SOL001(required - key)
+                    number_of_instances: 1 # SOL001(required)
+                  s3: # SOL001(required - key)
+                    number_of_instances: 1 # SOL001(required)
+                  s4: # SOL001(required - key)
+                    number_of_instances: 1 # SOL001(required)
+                #scale_info: # SOL001(0..N)
+                  #default_scaling_aspect: # SOL001(required - key)
+                    #scale_level: 1 # SOL001(required)
+            default_instantiation_level_id: default # SOL001(optional)
+            #supported_operation: # IFA011(0..N)    
+            vnf_lcm_operations_configuration: {} # SOL001(required)
+            #  instantiate: # SOL001(optional)
+            #    parameters: {} # SOL001(optional) - NOTE: parameters data type not yet defined
+            affinity_or_anti_affinity_groups: # IFA011(0..N)
+              c2_aa_group: # IFA011
+                type: anti-affinity # IFA011(required) - NOTE: not sure about literal value
+                scope: 'NFVI-node' # IFA011(required)
+              s3_aa_group: # IFA011
+                type: anti-affinity # IFA011(required) - NOTE: not sure about literal value
+                scope: 'NFVI-node' # IFA011(required)
+              s4_aa_group: # IFA011
+                type: anti-affinity # IFA011(required) - NOTE: not sure about literal value
+                scope: 'NFVI-node' # IFA011(required)
+            #monitoring_parameter: # IFA011(0..N)
+            #scaling_aspect: # IFA011(0..N) 
+              #- default_scaling_aspect: # IFA011 - NOTE: This may be an in-line ScalingAspect?
+            cisco_esc_properties: # CiscoESC - NOTE: NFVO can ignore this
+              policies:
+                1:
+                  conditions:
+                    - name: 'LCS::PRE_DEPLOY'
+                  actions:
+                    - name: 'GEN_VPC_CHASSIS_ID'
+                      type: 'SCRIPT'
+                      # NOTE: TOSCA inputs and the { get_input: <name> } syntax 
+                      #       are defined in ToscaNFV/ToscaSP
+                      #       See 'inputs' under topology-template above, for details on declaring inputs
+                      #       and assigning them through the Cisco ESC ETSI API.
+                      properties:
+                        CHASSIS_KEY: { get_input: CHASSIS_KEY }
+                        script_filename: /opt/cisco/esc/esc-scripts/esc_vpc_chassis_id.py
+                    - name: 'GEN_VPC_SSH_KEYS'
+                      type: 'SCRIPT'
+                      properties:
+                        script_filename: /opt/cisco/esc/esc-scripts/esc-vpc-di-internal-keys.sh
+            
+##############################
+# VDU configuration for "c1" #
+##############################
+    c1:
+      #type: tosca.nodes.nfv.VDU.Compute # SOL001
+      type: tosca.nodes.nfv.VDU.Compute.CiscoESC # CiscoESC - NOTE: NFVO can strip suffix
+      capabilities:
+        virtual_compute: # SOL001
+          properties:
+            virtual_cpu: # SOL001
+              #cpu_architecture: x86 # SOL001
+              num_virtual_cpu: 8 # SOL001
+              #virtual_cpu_clock: 1800 MHz # SOL001
+            virtual_memory: # SOL001 # SOL001
+              virtual_mem_size: 16 GB # SOL001
+      requirements:
+        - virtual_storage: CF1-volume-cf-boot # SOL001
+        - virtual_storage: CF1-volume-cf-cdr # SOL001
+      properties:
+        additional_vnfc_configurable_properties: {} # SOL001 - NOTE: is this for day0? Not sure.
+          
+        cisco_esc_properties: # CiscoESC - NOTE: NFVO can ignore this
+          # NOTE: TOSCA inputs and the { get_input: <name> } syntax 
+          #       are defined in ToscaNFV/ToscaSP
+          #       See 'inputs' under topology-template above, for details on declaring inputs
+          #       and assigning them through the Cisco ESC ETSI API.
+          config_data:
+            staros_config.txt:
+              file: { get_input: CF_STAROS_CONFIG_URL }
+              variables:
+                CF_DOMAIN_NAME: { get_input: CF_DOMAIN_NAME }
+                CF_NAME_SERVER: { get_input: CF_NAME_SERVER }
+                CF_VIP_ADDR: { get_input: CF_VIP_ADDR }
+                SLOT_CARD_NUMBER: { get_input: CF1_SLOT_CARD_NUMBER }
+            staros_param.cfg:
+              file: { get_input: CF_STAROS_PARAM_URL }
+              variables:
+                CARD_TYPE_NUM: { get_input: CF_CARD_TYPE_NUM }
+                SLOT_CARD_NUMBER: { get_input: CF1_SLOT_CARD_NUMBER }
+                VNFM_PROXY_ADDRS: { get_input: VNFM_PROXY_ADDRS }
+          
+      artifacts:
+        - sw_image: # SOL001 - NOTE:  It appears there is no way to share sw_image artifacts within a VNF
+            name: 'CF Base Image' # SOL001(required)
+            version: '1.0' # SOL001(required)
+            checksum: 9af30fce37a4c5c831e095745744d6d2 # SOL001(required)
+            container_format: bare # SOL001(required)
+            disk_format: qcow2 # SOL001(required)
+            min_disk: 2 GB # SOL001(required)
+            #min_ram: 8096 MB #SOL001(optional)
+            size: 2 GB # SOL001(required)
+            sw_image: Automation-Cirros-Image.qcow2 # SOL001(required)
+            #operating_system: Linux # SOL001(optional)
+            #supported_virtualisation_environments: # SOL001(optional)
+            #  - KVM
+            
+##############################
+# VDU configuration for "c2" #
+##############################
+    c2:
+      #type: tosca.nodes.nfv.VDU.Compute # SOL001
+      type: tosca.nodes.nfv.VDU.Compute.CiscoESC # CiscoESC - NOTE: NFVO can strip suffix
+      capabilities:
+        virtual_compute: # SOL001
+          properties:
+            virtual_cpu: # SOL001
+              #cpu_architecture: x86 # SOL001
+              num_virtual_cpu: 8 # SOL001
+              #virtual_cpu_clock: 1800 MHz # SOL001
+            virtual_memory: # SOL001
+              virtual_mem_size: 16 GB # SOL001
+      requirements:
+        - virtual_storage: CF2-volume-cf-boot # SOL001
+        - virtual_storage: CF2-volume-cf-cdr # SOL001
+      properties:
+        additional_vnfc_configurable_properties: {} # SOL001 - NOTE: is this for day0? Not sure.
+              
+        cisco_esc_properties: # CiscoESC - NOTE: NFVO can ignore this
+          # NOTE: TOSCA inputs and the { get_input: <name> } syntax 
+          #       are defined in ToscaNFV/ToscaSP
+          #       See 'inputs' under topology-template above, for details on declaring inputs
+          #       and assigning them through the Cisco ESC ETSI API.
+          config_data:
+            staros_config.txt:
+              file: { get_input: CF_STAROS_CONFIG_URL }
+              variables:
+                CF_DOMAIN_NAME: { get_input: CF_DOMAIN_NAME }
+                CF_NAME_SERVER: { get_input: CF_NAME_SERVER }
+                CF_VIP_ADDR: { get_input: CF_VIP_ADDR }
+                SLOT_CARD_NUMBER: { get_input: CF2_SLOT_CARD_NUMBER }
+            staros_param.cfg:
+              file: { get_input: CF_STAROS_PARAM_URL }
+              variables:
+                CARD_TYPE_NUM: { get_input: CF_CARD_TYPE_NUM }
+                SLOT_CARD_NUMBER: { get_input: CF2_SLOT_CARD_NUMBER }
+                VNFM_PROXY_ADDRS: { get_input: VNFM_PROXY_ADDRS }
+                
+      artifacts:
+        - sw_image: # SOL001 - NOTE:  It appears there is no way to share sw_image artifacts within a VNF
+            name: 'CF Base Image' # SOL001(required)
+            version: '1.0' # SOL001(required)
+            checksum: 9af30fce37a4c5c831e095745744d6d2 # SOL001(required)
+            container_format: bare # SOL001(required)
+            disk_format: qcow2 # SOL001(required)
+            min_disk: 2 GB # SOL001(required)
+            #min_ram: 8096 MB #SOL001(optional)
+            size: 2 GB # SOL001(required)
+            sw_image: Automation-Cirros-Image.qcow2 # SOL001(required)
+            #operating_system: Linux # SOL001(optional)
+            #supported_virtualisation_environments: # SOL001(optional)
+            #  - KVM
+            
+##############################
+# VDU configuration for "s3" #
+##############################
+    s3:
+      #type: tosca.nodes.nfv.VDU.Compute # SOL001
+      type: tosca.nodes.nfv.VDU.Compute.CiscoESC # CiscoESC - NOTE: NFVO can strip suffix
+      capabilities:
+        virtual_compute: # SOL001
+          properties:
+            virtual_cpu: # SOL001
+              #cpu_architecture: x86 # SOL001
+              num_virtual_cpu: 8 # SOL001
+              #virtual_cpu_clock: 1800 MHz # SOL001
+            virtual_memory: # SOL001
+              virtual_mem_size: 16 GB # SOL001
+      properties:
+        additional_vnfc_configurable_properties: {} # SOL001 - NOTE: is this for day0? Not sure.
+        
+        cisco_esc_properties: # CiscoESC - NOTE: NFVO can ignore this
+          # NOTE: TOSCA inputs and the { get_input: <name> } syntax 
+          #       are defined in ToscaNFV/ToscaSP
+          #       See 'inputs' under topology-template above, for details on declaring inputs
+          #       and assigning them through the Cisco ESC ETSI API.
+          config_data:
+            staros_param.cfg:
+              file: { get_input: SF_STAROS_PARAM_URL }
+              variables:
+                CARD_TYPE_NUM: { get_input: SF_CARD_TYPE_NUM }
+                SLOT_CARD_NUMBER: { get_input: SF1_SLOT_CARD_NUMBER }
+                VNFM_PROXY_ADDRS: { get_input: VNFM_PROXY_ADDRS }
+ 
+      artifacts:
+        - sw_image: # SOL001 - NOTE:  It appears there is no way to share sw_image artifacts within a VNF
+            name: 'SF Base Image' # SOL001(required)
+            version: '1.0' # SOL001(required)
+            checksum: 9af30fce37a4c5c831e095745744d6d2 # SOL001(required)
+            container_format: bare # SOL001(required)
+            disk_format: qcow2 # SOL001(required)
+            min_disk: 2 GB # SOL001(required)
+            #min_ram: 8096 MB # SOL001(optional)
+            size: 2 GB # SOL001(required)
+            sw_image: Automation-Cirros-Image.qcow2 # SOL001(required)
+            #operating_system: Linux # SOL001(optional)
+            #supported_virtualisation_environments: # SOL001(optional)
+            #  - KVM
+
+##############################
+# VDU configuration for "s4" #
+##############################
+    s4:
+      #type: tosca.nodes.nfv.VDU.Compute # SOL001
+      type: tosca.nodes.nfv.VDU.Compute.CiscoESC # CiscoESC - NOTE: NFVO can strip suffix
+      capabilities:
+        virtual_compute: # SOL001
+          properties:
+            virtual_cpu: # SOL001
+              #cpu_architecture: x86 # SOL001
+              num_virtual_cpu: 8 # SOL001
+              #virtual_cpu_clock: 1800 MHz # SOL001
+            virtual_memory: # SOL001
+              virtual_mem_size: 16 GB # SOL001
+      properties:          
+        additional_vnfc_configurable_properties: {} # SOL001 - NOTE: is this for day0? Not sure.
+          
+        cisco_esc_properties: # CiscoESC - NOTE: NFVO can ignore this
+          # NOTE: TOSCA inputs and the { get_input: <name> } syntax 
+          #       are defined in ToscaNFV/ToscaSP
+          #       See 'inputs' under topology-template above, for details on declaring inputs
+          #       and assigning them through the Cisco ESC ETSI API.
+          config_data:
+            staros_param.cfg:
+              file: { get_input: SF_STAROS_PARAM_URL }
+              variables:
+                CARD_TYPE_NUM: { get_input: SF_CARD_TYPE_NUM }
+                SLOT_CARD_NUMBER: { get_input: SF2_SLOT_CARD_NUMBER }
+                VNFM_PROXY_ADDRS: { get_input: VNFM_PROXY_ADDRS }  
+
+      artifacts:
+        - sw_image: # SOL001 - NOTE:  It appears there is no way to share sw_image artifacts within a VNF
+            name: 'SF Base Image' # SOL001(required)
+            version: '1.0' # SOL001(required)
+            checksum: 9af30fce37a4c5c831e095745744d6d2 # SOL001(required)
+            container_format: bare # SOL001(required)
+            disk_format: qcow2 # SOL001(required)
+            min_disk: 2 GB # SOL001(required)
+            #min_ram: 8096 MB # SOL001(optional)
+            size: 2 GB # SOL001(required)
+            sw_image: Automation-Cirros-Image.qcow2 # SOL001(required)
+            #operating_system: Linux # SOL001(optional)
+            #supported_virtualisation_environments: # SOL001(optional)
+            #  - KVM
+
+###################
+# Virtual Storage #
+###################
+
+    CF1-volume-cf-boot:
+      #type: tosca.nodes.nfv.VDU.VirtualStorage # SOL001
+      type: tosca.nodes.nfv.VDU.VirtualStorage.CiscoESC # CiscoESC - NOTE: NFVO can strip suffix
+      properties:
+        type_of_storage: volume # SOL001
+        size_of_storage: 16 # SOL001 - NOTE: in GB
+        cisco_esc_properties: # CiscoESC - NOTE: NFVO can ignore this
+          vol_id: 1
+          bus: ide
+          boot_index: 0
+          type: LUKS
+      artifacts:
+        - sw_image: # SOL001 - NOTE:  It appears there is no way to share sw_image artifacts within a VNF
+            name: 'CF Bootable Image' # SOL001(required)
+            version: '1.0' # SOL001(required)
+            checksum: 9af30fce37a4c5c831e095745744d6d2 # SOL001(required)
+            container_format: bare # SOL001(required)
+            disk_format: qcow2 # SOL001(required)
+            min_disk: 2 GB # SOL001(required)
+            #min_ram: 8096 MB # SOL001(optional)
+            size: 2 GB # SOL001(required)
+            sw_image: Automation-Cirros-Image.qcow2 # SOL001(required)
+            #operating_system: Linux # SOL001(optional)
+            #supported_virtualisation_environments: # SOL001(optional)
+            #  - KVM
+      
+    CF1-volume-cf-cdr:
+      #type: tosca.nodes.nfv.VDU.VirtualStorage # SOL001
+      type: tosca.nodes.nfv.VDU.VirtualStorage.CiscoESC # CiscoESC - NOTE: NFVO can strip suffix
+      properties:
+        type_of_storage: volume # SOL001
+        size_of_storage: 200 # SOL001 - NOTE: in GB
+        cisco_esc_properties: # CiscoESC - NOTE: NFVO can ignore this
+          vol_id: 0
+          bus: ide
+          type: LUKS
+        
+    CF2-volume-cf-boot:
+      #type: tosca.nodes.nfv.VDU.VirtualStorage # SOL001
+      type: tosca.nodes.nfv.VDU.VirtualStorage.CiscoESC # CiscoESC - NOTE: NFVO can strip suffix
+      properties:
+        type_of_storage: volume # SOL001
+        size_of_storage: 16 # SOL001 - NOTE: in GB
+        cisco_esc_properties: # CiscoESC - NOTE: NFVO can ignore this
+          vol_id: 1
+          bus: ide
+          boot_index: 0
+          type: LUKS
+      artifacts:
+        - sw_image: # SOL001 - NOTE:  It appears there is no way to share sw_image artifacts within a VNF
+            name: 'CF Bootable Image' # SOL001(required)
+            version: '1.0' # SOL001(required)
+            checksum: 9af30fce37a4c5c831e095745744d6d2 # SOL001(required)
+            container_format: bare # SOL001(required)
+            disk_format: qcow2 # SOL001(required)
+            min_disk: 2 GB # SOL001(required)
+            #min_ram: 8096 MB # SOL001(optional)
+            size: 2 GB # SOL001(required)
+            sw_image: Automation-Cirros-Image.qcow2 # SOL001(required)
+            #operating_system: Linux # SOL001(optional)
+            #supported_virtualisation_environments: # SOL001(optional)
+            #  - KVM
+            
+    CF2-volume-cf-cdr:
+      #type: tosca.nodes.nfv.VDU.VirtualStorage # SOL001
+      type: tosca.nodes.nfv.VDU.VirtualStorage.CiscoESC # CiscoESC - NOTE: NFVO can strip suffix
+      properties:
+        type_of_storage: volume # SOL001
+        size_of_storage: 200 # SOL001 - NOTE: in GB
+        cisco_esc_properties: # CiscoESC - NOTE: NFVO can ignore this
+          vol_id: 0
+          bus: ide
+          type: LUKS
+      
+##############################
+# Connection points for "c1" #
+##############################
+
+    c1_nic0:
+      #type: tosca.nodes.nfv.Cpd # SOL001
+      type: tosca.nodes.nfv.Cpd.CiscoESC # CiscoESC - NOTE: NFVO can strip suffix
+      properties:
+        layer_protocol: ipv4 # SOL001...ToscaNFV(required)
+        cisco_esc_properties: # CiscoESC - NOTE: NFVO can ignore this
+          nicid: 0    
+          type: direct
+          allowed_address_pairs:
+            - ip_address: 172.16.0.0/18
+      requirements:
+        - virtual_link: di_internal1_net # SOL001
+        - virtual_binding: c1 # SOL001
+            
+    c1_nic1:
+      #type: tosca.nodes.nfv.Cpd # SOL001
+      type: tosca.nodes.nfv.Cpd.CiscoESC # CiscoESC - NOTE: NFVO can strip suffix
+      properties:
+        layer_protocol: ipv4 # SOL001...ToscaNFV(required)
+        cisco_esc_properties: # CiscoESC - NOTE: NFVO can ignore this
+          nicid: 1
+          allowed_address_pairs:
+            - ip_address: 172.77.12.0/24
+      requirements:
+        - virtual_link: orch_net # SOL001
+        - virtual_binding: c1 # SOL001
+
+    c1_nic2:
+      #type: tosca.nodes.nfv.Cpd # SOL001
+      type: tosca.nodes.nfv.Cpd.CiscoESC # CiscoESC - NOTE: NFVO can strip suffix
+      properties:
+        layer_protocol: ipv4 # SOL001...ToscaNFV(required)
+        cisco_esc_properties: # CiscoESC - NOTE: NFVO can ignore this
+          nicid: 2
+          allowed_address_pairs:
+            - ip_address: 172.77.11.0/24
+      requirements:
+        - virtual_link: mgmt_net # SOL001
+        - virtual_binding: c1 # SOL001
+            
+    c1_nic3:
+      #type: tosca.nodes.nfv.Cpd # SOL001
+      type: tosca.nodes.nfv.Cpd.CiscoESC # CiscoESC - NOTE: NFVO can strip suffix
+      properties:
+        layer_protocol: ipv4 # SOL001...ToscaNFV(required)
+        cisco_esc_properties: # CiscoESC - NOTE: NFVO can ignore this
+          nicid: 3
+          type: direct
+          allowed_address_pairs:
+            - ip_address: 172.16.0.0/18
+      requirements:
+        - virtual_link: di_internal2_net # SOL001
+        - virtual_binding: c1 # SOL001
+
+##############################
+# Connection points for "c2" #
+##############################
+
+    c2_nic0:
+      #type: tosca.nodes.nfv.Cpd # SOL001
+      type: tosca.nodes.nfv.Cpd.CiscoESC # CiscoESC - NOTE: NFVO can strip suffix
+      properties:
+        layer_protocol: ipv4 # SOL001...ToscaNFV(required)
+        cisco_esc_properties: # CiscoESC - NOTE: NFVO can ignore this
+          nicid: 0
+          type: direct
+          allowed_address_pairs:
+            - ip_address: 172.16.0.0/18
+      requirements:
+        - virtual_link: di_internal1_net # SOL001
+        - virtual_binding: c2 # SOL001
+            
+    c2_nic1:
+      #type: tosca.nodes.nfv.Cpd # SOL001
+      type: tosca.nodes.nfv.Cpd.CiscoESC # CiscoESC - NOTE: NFVO can strip suffix
+      properties:
+        layer_protocol: ipv4 # SOL001...ToscaNFV(required)
+        cisco_esc_properties: # CiscoESC - NOTE: NFVO can ignore this
+          nicid: 1
+          allowed_address_pairs:
+            - ip_address: 172.77.12.0/24
+      requirements:
+        - virtual_link: orch_net # SOL001
+        - virtual_binding: c2 # SOL001
+
+    c2_nic2:
+      #type: tosca.nodes.nfv.Cpd # SOL001
+      type: tosca.nodes.nfv.Cpd.CiscoESC # CiscoESC - NOTE: NFVO can strip suffix
+      properties:
+        layer_protocol: ipv4 # SOL001...ToscaNFV(required)
+        cisco_esc_properties: # CiscoESC - NOTE: NFVO can ignore this
+          nicid: 2
+          allowed_address_pairs:
+            - ip_address: 172.77.11.0/24
+      requirements:
+        - virtual_link: mgmt_net # SOL001
+        - virtual_binding: c2 # SOL001
+            
+    c2_nic3:
+      #type: tosca.nodes.nfv.Cpd # SOL001
+      type: tosca.nodes.nfv.Cpd.CiscoESC # CiscoESC - NOTE: NFVO can strip suffix
+      properties:
+        layer_protocol: ipv4 # SOL001...ToscaNFV(required)
+        cisco_esc_properties: # CiscoESC - NOTE: NFVO can ignore this
+          nicid: 3
+          type: direct
+          allowed_address_pairs:
+            - ip_address: 172.16.0.0/18
+      requirements:
+        - virtual_link: di_internal2_net # SOL001
+        - virtual_binding: c2 # SOL001
+        
+##############################
+# Connection points for "s3" #
+##############################
+
+    s3_nic0:
+      #type: tosca.nodes.nfv.Cpd # SOL001
+      type: tosca.nodes.nfv.Cpd.CiscoESC # CiscoESC - NOTE: NFVO can strip suffix
+      properties:
+        layer_protocol: ipv4 # SOL001...ToscaNFV(required)
+        cisco_esc_properties: # CiscoESC - NOTE: NFVO can ignore this
+          nicid: 0
+          type: direct
+          allowed_address_pairs:
+            - ip_address: 172.16.0.0/18
+      requirements:
+        - virtual_link: di_internal1_net # SOL001
+        - virtual_binding: s3 # SOL001
+            
+    s3_nic1:
+      #type: tosca.nodes.nfv.Cpd # SOL001
+      type: tosca.nodes.nfv.Cpd.CiscoESC # CiscoESC - NOTE: NFVO can strip suffix
+      properties:
+        layer_protocol: ipv4 # SOL001...ToscaNFV(required)
+        cisco_esc_properties: # CiscoESC - NOTE: NFVO can ignore this
+          nicid: 1
+          allowed_address_pairs:
+            - ip_address: 172.77.12.0/24
+      requirements:
+        - virtual_link: orch_net # SOL001
+        - virtual_binding: s3 # SOL001
+            
+    s3_nic2:
+      #type: tosca.nodes.nfv.Cpd # SOL001
+      type: tosca.nodes.nfv.Cpd.CiscoESC # CiscoESC - NOTE: NFVO can strip suffix
+      properties:
+        layer_protocol: ipv4 # SOL001...ToscaNFV(required)
+        cisco_esc_properties: # CiscoESC - NOTE: NFVO can ignore this
+          nicid: 2
+          type: direct
+      requirements:
+        - virtual_link: service1_net # SOL001
+        - virtual_binding: s3 # SOL001
+            
+    s3_nic3:
+      #type: tosca.nodes.nfv.Cpd # SOL001
+      type: tosca.nodes.nfv.Cpd.CiscoESC # CiscoESC - NOTE: NFVO can strip suffix
+      properties:
+        layer_protocol: ipv4 # SOL001...ToscaNFV(required)
+        cisco_esc_properties: # CiscoESC - NOTE: NFVO can ignore this
+          nicid: 3
+          type: direct
+      requirements:
+        - virtual_link: service2_net # SOL001
+        - virtual_binding: s3 # SOL001
+
+    s3_nic4:
+      #type: tosca.nodes.nfv.Cpd # SOL001
+      type: tosca.nodes.nfv.Cpd.CiscoESC # CiscoESC - NOTE: NFVO can strip suffix
+      properties:
+        layer_protocol: ipv4 # SOL001...ToscaNFV(required)
+        cisco_esc_properties: # CiscoESC - NOTE: NFVO can ignore this
+          nicid: 4
+          type: direct
+          allowed_address_pairs:
+            - ip_address: 172.16.0.0/18
+      requirements:
+        - virtual_link: di_internal1_net # SOL001
+        - virtual_binding: s3 # SOL001
+      
+    s3_nic5:
+      #type: tosca.nodes.nfv.Cpd # SOL001
+      type: tosca.nodes.nfv.Cpd.CiscoESC # CiscoESC - NOTE: NFVO can strip suffix
+      properties:
+        layer_protocol: ipv4 # SOL001...ToscaNFV(required)
+        cisco_esc_properties: # CiscoESC - NOTE: NFVO can ignore this
+          nicid: 5
+          type: direct
+      requirements:
+        - virtual_link: service1_net # SOL001
+        - virtual_binding: s3 # SOL001
+            
+    s3_nic6:
+      #type: tosca.nodes.nfv.Cpd # SOL001
+      type: tosca.nodes.nfv.Cpd.CiscoESC # CiscoESC - NOTE: NFVO can strip suffix
+      properties:
+        layer_protocol: ipv4 # SOL001...ToscaNFV(required)
+        cisco_esc_properties: # CiscoESC - NOTE: NFVO can ignore this
+          nicid: 6
+          type: direct
+      requirements:
+        - virtual_link: service2_net # SOL001
+        - virtual_binding: s3 # SOL001
+
+##############################
+# Connection points for "s4" #
+##############################
+
+    s4_nic0:
+      #type: tosca.nodes.nfv.Cpd # SOL001
+      type: tosca.nodes.nfv.Cpd.CiscoESC # CiscoESC - NOTE: NFVO can strip suffix
+      properties:
+        layer_protocol: ipv4 # SOL001...ToscaNFV(required)
+        cisco_esc_properties: # CiscoESC - NOTE: NFVO can ignore this
+          nicid: 0
+          type: direct
+          allowed_address_pairs:
+            - ip_address: 172.16.0.0/18
+      requirements:
+        - virtual_link: di_internal1_net # SOL001
+        - virtual_binding: s4 # SOL001
+            
+    s4_nic1:
+      #type: tosca.nodes.nfv.Cpd # SOL001
+      type: tosca.nodes.nfv.Cpd.CiscoESC # CiscoESC - NOTE: NFVO can strip suffix
+      properties:
+        layer_protocol: ipv4 # SOL001...ToscaNFV(required)
+        cisco_esc_properties: # CiscoESC - NOTE: NFVO can ignore this
+          nicid: 1
+          allowed_address_pairs:
+            - ip_address: 172.77.12.0/24
+      requirements:
+        - virtual_link: orch_net # SOL001
+        - virtual_binding: s4 # SOL001
+            
+    s4_nic2:
+      #type: tosca.nodes.nfv.Cpd # SOL001
+      type: tosca.nodes.nfv.Cpd.CiscoESC # CiscoESC - NOTE: NFVO can strip suffix
+      properties:
+        layer_protocol: ipv4 # SOL001...ToscaNFV(required)
+        cisco_esc_properties: # CiscoESC - NOTE: NFVO can ignore this
+          nicid: 2
+          type: direct
+      requirements:
+        - virtual_link: service1_net # SOL001
+        - virtual_binding: s4 # SOL001
+            
+    s4_nic3:
+      #type: tosca.nodes.nfv.Cpd # SOL001
+      type: tosca.nodes.nfv.Cpd.CiscoESC # CiscoESC - NOTE: NFVO can strip suffix
+      properties:
+        layer_protocol: ipv4 # SOL001...ToscaNFV(required)
+        cisco_esc_properties: # CiscoESC - NOTE: NFVO can ignore this
+          nicid: 3
+          type: direct
+      requirements:
+        - virtual_link: service2_net # SOL001
+        - virtual_binding: s4 # SOL001
+
+    s4_nic4:
+      #type: tosca.nodes.nfv.Cpd # SOL001
+      type: tosca.nodes.nfv.Cpd.CiscoESC # CiscoESC - NOTE: NFVO can strip suffix
+      properties:
+        layer_protocol: ipv4 # SOL001...ToscaNFV(required)
+        cisco_esc_properties: # CiscoESC - NOTE: NFVO can ignore this
+          nicid: 4
+          type: direct
+          allowed_address_pairs:
+            - ip_address: 172.16.0.0/18
+      requirements:
+        - virtual_link: di_internal1_net # SOL001
+        - virtual_binding: s4 # SOL001
+      
+    s4_nic5:
+      #type: tosca.nodes.nfv.Cpd # SOL001
+      type: tosca.nodes.nfv.Cpd.CiscoESC # CiscoESC - NOTE: NFVO can strip suffix
+      properties:
+        layer_protocol: ipv4 # SOL001...ToscaNFV(required)
+        cisco_esc_properties: # CiscoESC - NOTE: NFVO can ignore this
+          nicid: 5
+          type: direct
+      requirements:
+        - virtual_link: service1_net # SOL001
+        - virtual_binding: s4 # SOL001
+            
+    s4_nic6:
+      #type: tosca.nodes.nfv.Cpd # SOL001
+      type: tosca.nodes.nfv.Cpd.CiscoESC # CiscoESC - NOTE: NFVO can strip suffix
+      properties:
+        layer_protocol: ipv4 # SOL001...ToscaNFV(required)
+        cisco_esc_properties: # CiscoESC - NOTE: NFVO can ignore this
+          nicid: 6
+          type: direct
+      requirements:
+        - virtual_link: service2_net # SOL001
+        - virtual_binding: s4 # SOL001
+
+###############################################
+# Externally-Managed (OOB)                    #
+# Internal Virtual Links                      #
+#                                             #
+# Specify vim network during instantiation:   #
+#      InstantiateVnfRequest                  #
+#        .extManagedVirtualLinks              #
+#          .id=<name_or_uuid_of_vim_network>  #
+#          .virtualLinkDescId=<VL_identifier> #
+###############################################
+
+    di_internal1_net:
+      #type: tosca.nodes.nfv.VL # Tosca-NFV:WD01,Rev02(April 2015)
+      type: tosca.nodes.nfv.VnfVirtualLinkDesc # SOL001; Tosca-NFV:WD04,Rev05(Jan 2017)
+      properties:
+        connectivity_type: # SOL001(required)
+          layer_protocol: ipv4 # SOL001(required)
+          #flow_pattern: Line|Tree|Mesh # SOL001(optional)
+        vl_flavours: {} # Tosca-NFV(required); SOL001(required)
+        test_access: [] # Tosca-NFV(optional); SOL001(optional)
+        description: DI Internal 1 Network VL # SOL001(optional)
+        
+    di_internal2_net:
+      #type: tosca.nodes.nfv.VL # Tosca-NFV:WD01,Rev02(April 2015)
+      type: tosca.nodes.nfv.VnfVirtualLinkDesc # SOL001; Tosca-NFV:WD04,Rev05(Jan 2017)
+      properties:
+        connectivity_type: # SOL001(required)
+          layer_protocol: ipv4 # SOL001(required)
+          #flow_pattern: Line|Tree|Mesh # SOL001(optional)
+        vl_flavours: {} # SOL001(required)
+        test_access: [] # SOL001(optional)
+        description: DI Internal 2 Network VL # SOL001(optional)
+        
+    service1_net:
+      #type: tosca.nodes.nfv.VL # Tosca-NFV:WD01,Rev02(April 2015)
+      type: tosca.nodes.nfv.VnfVirtualLinkDesc # SOL001; Tosca-NFV:WD04,Rev05(Jan 2017)
+      properties:
+        connectivity_type: # SOL001(required)
+          layer_protocol: ipv4 # SOL001(required)
+          #flow_pattern: Line|Tree|Mesh # SOL001(optional)
+        vl_flavours: {} # SOL001(required)
+        test_access: [] # SOL001(optional)
+        description: Service 1 Network VL # SOL001(optional)
+
+    service2_net:
+      #type: tosca.nodes.nfv.VL # Tosca-NFV:WD01,Rev02(April 2015)
+      type: tosca.nodes.nfv.VnfVirtualLinkDesc # SOL001; Tosca-NFV:WD04,Rev05(Jan 2017)
+      properties:
+        connectivity_type: # SOL001(required)
+          layer_protocol: ipv4 # SOL001(required)
+          #flow_pattern: Line|Tree|Mesh # SOL001(optional)
+        vl_flavours: {} # SOL001(required)
+        test_access: [] # SOL001(optional)
+        description: Service 2 Network VL # SOL001(optional)
+        
+    orch_net:
+      #type: tosca.nodes.nfv.VL # Tosca-NFV:WD01,Rev02(April 2015)
+      type: tosca.nodes.nfv.VnfVirtualLinkDesc # SOL001; Tosca-NFV:WD04,Rev05(Jan 2017)
+      properties: 
+        connectivity_type: # SOL001(required)
+          layer_protocol: ipv4 # SOL001(required)
+          #flow_pattern: Line|Tree|Mesh # SOL001(optional)
+        vl_flavours: {} # SOL001(required)
+        #test_access: [] # SOL001(optional)
+        #description: Orchestration Network VL # SOL001(optional)
+
+    mgmt_net:
+      #type: tosca.nodes.nfv.VL # Tosca-NFV:WD01,Rev02(April 2015)
+      type: tosca.nodes.nfv.VnfVirtualLinkDesc # SOL001; Tosca-NFV:WD04,Rev05(Jan 2017)
+      properties:
+        connectivity_type: # SOL001(required)
+          layer_protocol: ipv4 # SOL001(required)
+          #flow_pattern: Line|Tree|Mesh # SOL001(optional)
+        vl_flavours: {} # SOL001(required)
+        test_access: [] # SOL001(optional)
+        description: Management Network VL # SOL001(optional)
+
+
+##############################
+# External Connection Points #
+##############################
+    anECP:
+      type: tosca.nodes.nfv.ECP # SOL001
+      properties:
+        #virtual_network_interface_requirements: [] # SOL001(optional)
+        layer_protocol: ipv4 # SOL001(required)
+      requirements:
+        #- external_virtual_link: # aVnfVirtualLinkDescReference - SOL001(optional - use substitution_mappings instead?)
+        - internal_connection_point: aVduCpd # SOL001(must specify either an iCP or iVL, and not both)
+          # OR
+        # - internal_virtual_link: aVnfVirtualLinkDesc # SOL001(must specify either an iCP or iVL, and not both)
+

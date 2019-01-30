@@ -1,0 +1,163 @@
+tosca_definitions_version: tosca_simple_profile_for_nfv_1_0_0
+description: CSR From Tosca
+
+metadata:
+  template_name: vnfd_csr1kv
+
+topology_template:
+  inputs:
+    ADMIN_PASSWORD:
+      description: The Admin password for Day0
+
+  node_templates:
+#####################
+# VNF configuration #
+#####################
+    vnf:
+      type: tosca.nodes.nfv.VNF.CiscoESC
+      properties:
+        descriptor_id: 9ee0ce39-cf0a-41ef-b01a-b62b40777901
+        descriptor_version: 1.0
+        provider: Cisco
+        product_name: CSR1kv
+        software_version: 1.0
+        product_info_name: 'Cisco Cloud Services Router 1000v'
+        vnfm_info:
+          - 'Cisco ESC'
+      requirements:
+        - virtual_link: [ ecpMgmt,  external_virtual_link ]
+        - virtual_link: [ ecpLeft,  external_virtual_link ] 
+        - virtual_link: [ ecpRight, external_virtual_link ] 
+      #####################
+      # Deployment Flavor #
+      #####################
+      capabilities:
+        deployment_flavour: 
+          properties:
+            flavour_id: default 
+            description: 'Default VNF Deployment Flavour' 
+            vdu_profile: 
+              csr: 
+                min_number_of_instances: 1 
+                max_number_of_instances: 1 
+            instantiation_levels: 
+              default:
+                description: 'Default Instantiation Level' 
+                vdu_levels: 
+                  csr: 
+                    number_of_instances: 1 
+            default_instantiation_level_id: default 
+            vnf_lcm_operations_configuration: {} 
+
+##############################
+# VDU configuration for "csr" #
+##############################
+    csr:
+      type: tosca.nodes.nfv.VDU.Compute.CiscoESC
+      capabilities:
+        virtual_compute: 
+          properties:
+            virtual_cpu: 
+              num_virtual_cpu: 8 
+            virtual_memory: 
+              virtual_mem_size: 16 GB 
+      requirements:
+        - virtual_storage: CSR-volume-cf-boot 
+      properties:
+        additional_vnfc_configurable_properties: {} 
+
+      artifacts:
+        - sw_image: 
+            name: 'CSR Image' 
+            version: '1.0' 
+            checksum: 9af30fce37a4c5c831e095745744d6d2 
+            container_format: bare 
+            disk_format: qcow2 
+            min_disk: 2 GB 
+            size: 2 GB 
+            sw_image: file:///CSR-14.0.21.qcow2 
+
+###################
+# Virtual Storage #
+###################
+
+    CSR-volume-cf-boot:
+      type: tosca.nodes.nfv.VDU.VirtualStorage.CiscoESC
+      properties:
+        type_of_storage: volume 
+        size_of_storage: 16 
+        cisco_esc_properties: 
+          vol_id: 1
+          bus: ide
+          boot_index: 0
+          type: LUKS
+      artifacts:
+        - sw_image: 
+            name: 'CF Bootable Image' 
+            version: '1.0' 
+            checksum: 9af30fce37a4c5c831e095745744d6d2 
+            container_format: qcow2 
+            disk_format: bare 
+            min_disk: 2 GB 
+            size: 2 GB 
+            sw_image: Automation-Cirros-Image.qcow2 
+
+##############################
+# Connection points for "csr" #
+##############################
+
+    csr_nic0:
+      type: tosca.nodes.nfv.Cpd.CiscoESC
+      properties:
+        layer_protocol: ipv4 
+        cisco_esc_properties: 
+          nicid: 0
+          type: direct
+          allowed_address_pairs:
+            - ip_address: 172.16.0.0/18
+      requirements:
+        - virtual_binding: csr
+
+    csr_nic1:
+      type: tosca.nodes.nfv.Cpd.CiscoESC
+      properties:
+        layer_protocol: ipv4 
+        cisco_esc_properties: 
+          nicid: 1
+          allowed_address_pairs:
+            - ip_address: 172.77.12.0/24
+      requirements:
+        - virtual_binding: csr
+
+    csr_nic2:
+      type: tosca.nodes.nfv.Cpd.CiscoESC
+      properties:
+        layer_protocol: ipv4 
+        cisco_esc_properties: 
+          nicid: 2
+          allowed_address_pairs:
+            - ip_address: 172.77.11.0/24
+      requirements:
+        - virtual_binding: csr 
+
+##############################
+# External Connection Points #
+##############################
+    ecpMgmt:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv4 
+      requirements:
+        - internal_connection_point: csr_nic0 
+    ecpLeft:
+      type: tosca.nodes.nfv.ECP 
+      properties:
+        layer_protocol: ipv4 
+      requirements:
+        - internal_connection_point: csr_nic1 
+    ecpRight:
+      type: tosca.nodes.nfv.ECP 
+      properties:
+        layer_protocol: ipv4 
+      requirements:
+        - internal_connection_point: csr_nic2 
