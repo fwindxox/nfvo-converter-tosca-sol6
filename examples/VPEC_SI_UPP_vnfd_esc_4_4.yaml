@@ -17,7 +17,7 @@ dsl_definitions:
   software_version: &software_version '1.0'    
   descriptor_version: &descriptor_version '1.0'
   flavour_id: &flavour_id default 
-  flavour_description: &flavour_descriptin 'Default VNF Deployment Flavour'
+  flavour_description: &flavour_description 'Default VNF Deployment Flavour'
   vnfm: &vnfm '9:Cisco Elastic Services Controller:v04.04.01'
 
 
