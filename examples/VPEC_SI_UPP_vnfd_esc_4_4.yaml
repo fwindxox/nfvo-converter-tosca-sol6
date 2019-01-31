@@ -1,0 +1,390 @@
+tosca_definitions_version: tosca_simple_yaml_1_2
+description: VPC VNFD - SI 1 VDU (SOL001 v0.10.0) for Openstack
+
+imports:
+  - cisco_nfv_sol001_types.yaml
+  - etsi_nfv_sol001_vnfd_0_10_0_types.yaml
+
+metadata:
+  template_name: UPP_vnfd_esc_4_4-1130
+  template_author: Rakuten Systems
+  template_version: '1.0'
+
+dsl_definitions:
+  descriptor_id: &descriptor_id VEPC-SI    
+  provider: &provider cisco    
+  product_name: &product_name VPC 
+  software_version: &software_version '1.0'    
+  descriptor_version: &descriptor_version '1.0'
+  flavour_id: &flavour_id default 
+  flavour_description: &flavour_descriptin 'Default VNF Deployment Flavour'
+  vnfm: &vnfm '9:Cisco Elastic Services Controller:v04.04.01'
+
+
+node_types:
+  cisco.VPC.1_0.1_0:
+    derived_from: tosca.nodes.nfv.VNF
+    properties:
+      descriptor_id:
+        type: string
+        #constraints: [ valid_values: [ *descriptor_id ]]
+        default: *descriptor_id
+      provider:
+        type: string
+        #constraints: [ valid_values: [ *provider ] ]
+        default: *provider
+      product_name:
+        type: string
+        #constraints: [ valid_values: [ *product_name ] ]
+        default: *product_name
+      software_version:
+        type: string
+        #constraints: [ valid_values: [ *software_version ] ]
+        default: *software_version
+      descriptor_version:
+        type: string
+        #constraints: [ valid_values: [ *descriptor_version ] ]
+        default: *descriptor_version
+      flavour_id:
+        type: string
+        #constraints: [ valid_values: [ *flavour_id ] ]
+        default: *flavour_id
+      flavour_description:
+        type: string
+        #constraints: [ valid_values: [ *flavour_description ] ]
+        default: *flavour_description
+      vnfm_info:
+        type: list
+        entry_schema:
+          type: string
+        #constraints: [ valid_values: [ *vnfm ] ]
+        default: [ *vnfm ]
+      configurable_properties:
+        type: tosca.datatypes.nfv.VnfConfigurableProperties
+        description: Describes the configurable properties of the VNF
+        required: false
+    lcm_operations_configuration:
+        type: cisco.datatypes.nfv.VnfLcmOperationsConfiguration
+    interfaces:
+      Vnflcm:
+        type: cisco.interfaces.nfv.Vnflcm
+    artifacts:
+
+topology_template:
+###################
+# Template Inputs #
+###################
+  inputs:
+
+    UPP_FLAVOUR:
+      description: VIM Flavour for UPP VDUs
+      type: string
+    BOOTUP_TIME_UPP:
+      description: The time taken for the image to boot
+      type: integer
+
+    VIM_NETWORK_ORCH_SEC_GRP_0:
+      description: UPP ORCHESTRATION network ingress security group
+
+    #
+    # LCS Policy Properties
+    #>>>>>>investigate more>>>>>>>
+    CHASSIS_KEY:
+      description: VPC Chassis key
+
+    #NFVO-COMMENT DELETED BOOT, IMAGE , VOLUME VARIABLES
+  
+    UPP_NIC0_AADR_PAIRS:
+      description: UPP_nic0 allowed address pair
+    UPP_NIC1_AADR_PAIRS:
+      description: UPP_nic1 allowed address pair
+    UPP_NIC2_AADR_PAIRS:
+      description: UPP_nic2 allowed address pair
+    UPP_NIC3_AADR_PAIRS:
+      description: UPP_nic3 allowed address pair
+    
+   #day0 variables 
+    UPP_DOMAIN_NAME:
+      type: string
+      description: UPP Domain Name for Day0 Config (staros_config.txt)
+    UPP_NAME_SERVER:
+      type: string
+      description: UPP Nameserver for Day0 Config (staros_config.txt)
+    UPP_VIP_ADDR:
+      type: string
+      description: UPP VIP Address for Day0 Config (staros_config.txt)
+    UPP_IMAGE_NAME:
+      type: string
+      description: Image name input variable
+
+########################
+# Substitution Mapping #       
+########################
+  substitution_mappings:
+    node_type: cisco.VPC.1_0.1_0
+    requirements:
+      - virtual_link: [ UPP_nic0, virtual_link ]
+      - virtual_link: [ UPP_nic1, virtual_link ]
+      - virtual_link: [ UPP_nic2, virtual_link ]
+      - virtual_link: [ UPP_nic3, virtual_link ]
+
+
+##########
+# Nodes: #
+##########
+  node_templates:
+
+#####################
+# VNF configuration #
+#####################
+    vnf:
+      type: cisco.VPC.1_0.1_0
+      properties:
+        descriptor_id: VEPC-SI
+        descriptor_version: '1.0'
+        provider: cisco
+        product_name: VPC
+        software_version: 1.0
+        product_info_name: 'Virtual Packet Core (VPC); 32 vCPUs, 64Gb RAM, 66Gb vStorage'
+        vnfm_info:
+          - '9:Cisco Elastic Services Controller:v04.04.01'
+        configurable_properties:
+          is_autoscale_enabled: false
+          is_autoheal_enabled: false
+        lcm_operations_configuration:
+          heal:
+            recovery_action: REBOOT_THEN_REDEPLOY
+            recovery_wait_time: 1
+        flavour_id: default
+        flavour_description: 'Default VNF Deployment Flavour'
+      interfaces:
+        Vnflcm:
+          instantiate:
+            implementation: {get_artifact: [SELF, GEN_VPC_CHASSIS_ID]}
+            inputs:
+              script_parameters:
+                CHASSIS_KEY: { get_input: CHASSIS_KEY }
+              additional_parameters:
+                VIM_FLAVOR_UPP: { get_input: UPP_FLAVOUR }
+                BOOTUP_TIME_UPP: { get_input: BOOTUP_TIME_UPP }
+                UPP_DOMAIN_NAME: { get_input: UPP_DOMAIN_NAME }
+                UPP_NAME_SERVER: { get_input: UPP_NAME_SERVER }
+                UPP_VIP_ADDR: { get_input: UPP_VIP_ADDR }
+          instantiate_start:
+            implementation: {get_artifact: [SELF, GEN_VPC_SSH_KEYS]}
+      artifacts:
+        GEN_VPC_CHASSIS_ID:
+          type: tosca.artifacts.Implementation.Python
+          description: Generate chassis identifier
+          file: ../Files/Scripts/esc_vpc_chassis_id.py
+        GEN_VPC_SSH_KEYS:
+          type: tosca.artifacts.Implementation.Bash
+          description: VPC SSH key generation, using a shell script
+          file: ../Files/Scripts/esc-vpc-di-internal-keys.sh
+
+#####################
+# VDU configuration #
+#####################
+    UPP:
+      type: cisco.nodes.nfv.Vdu.Compute
+      properties:
+        name: UPP
+        description: UPP VDU no redundancy
+        boot_order:
+          - UPP-boot1-volume
+        configurable_properties:
+          additional_vnfc_configurable_properties:
+            vim_flavor: { get_input: UPP_FLAVOUR }
+            bootup_time: { get_input: BOOTUP_TIME_UPP }
+        vdu_profile:
+          min_number_of_instances: 1
+          max_number_of_instances: 1
+        kpi_data:
+          VM_ALIVE-1:
+            event_name: 'VM_ALIVE-1'
+            metric_value: 1
+            metric_cond: 'GT'
+            metric_type: 'UINT32'
+            metric_occurences_true: 1
+            metric_occurences_false: 30
+            metric_collector: 
+              metric_type: 'ICMPPing'
+              nicid: 1
+              address_id: 0
+              poll_frequency: 10
+              polling_unit: 'seconds'
+              continuous_alarm: false
+        admin_rules:
+          VM_ALIVE-1:
+            event_name: 'VM_ALIVE-1'
+            action:
+              - 'ALWAYS log'
+              - 'FALSE recover autohealing'
+              - 'TRUE esc_vm_alive_notification'
+        vendor_section:
+          cisco_esc:
+            config_data:
+              staros_config.txt:
+                file: ../Files/Scripts/staros_config.txt
+                variables:
+                  CF_DOMAIN_NAME: { get_input: UPP_DOMAIN_NAME }
+                  CF_NAME_SERVER: { get_input: UPP_NAME_SERVER }
+                  CF_VIP_ADDR: { get_input: UPP_VIP_ADDR }
+              new_param_sf.cfg:
+                file: ../Files/Scripts/new_param_sf.cfg
+
+      capabilities:
+        virtual_compute:
+          properties:
+            virtual_cpu:
+              num_virtual_cpu: 8
+            virtual_memory:
+              virtual_mem_size: 16 GB
+
+      requirements:
+        - virtual_storage:  UPP-boot1-volume
+
+
+
+#########################
+# Virtual Block Storage #
+#########################
+    UPP-boot1-volume:
+      type: cisco.nodes.nfv.Vdu.VirtualBlockStorage
+      properties:
+        virtual_block_storage_data:
+          size_of_storage: 16GB
+          vdu_storage_requirements:
+            vol_id: 1
+            bus: ide
+            boot_index: '0'
+            # TODO this should be fixed based on ESC
+            #type: lvm
+        sw_image_data:
+          name: { get_input: UPP_IMAGE_NAME }
+          version: '1.0'
+          checksum: 9af30fce37a4c5c831e095745744d6d2
+          container_format: bare
+          disk_format: qcow2
+          min_disk: 2 GB
+          size: 2 GB
+      artifacts:
+        sw_image:
+          type: tosca.artifacts.nfv.SwImage
+          file: ../Files/Images/production.70741.qvpc-si.qcow2
+          
+   
+
+######################################
+# Connection points for "UPP" #
+######################################
+    UPP_nic0:
+      type: cisco.nodes.nfv.VduCp
+      properties:
+        layer_protocols: [ ipv4 ]
+        protocol:
+          - associated_layer_protocol: ipv4
+        trunk_mode: false
+        order: 0
+        management: false
+        allowed_address_pairs:
+          - ip_address: { get_input: UPP_NIC0_AADR_PAIRS }
+      requirements:
+        - virtual_binding: UPP
+
+    UPP_nic1:
+      type: cisco.nodes.nfv.VduCp
+      properties:
+        layer_protocols: [ ipv4 ]
+        protocol:
+          - associated_layer_protocol: ipv4
+        trunk_mode: false
+        order: 1
+        management: true
+        allowed_address_pairs:
+          - ip_address: { get_input: UPP_NIC1_AADR_PAIRS }
+      requirements:
+        - virtual_binding: UPP
+
+    UPP_nic2:
+      type: cisco.nodes.nfv.VduCp
+      properties:
+        layer_protocols: [ ipv4 ]
+        protocol:
+          - associated_layer_protocol: ipv4
+        trunk_mode: false
+        order: 2
+        management: false
+        allowed_address_pairs:
+          - ip_address: { get_input: UPP_NIC2_AADR_PAIRS }
+        #NFVO-TODO Openstack tested here doesnt have sriov support
+        #iface_type: direct  
+      requirements:
+        - virtual_binding: UPP
+
+    UPP_nic3:
+      type: cisco.nodes.nfv.VduCp
+      properties:
+        layer_protocols: [ ipv4 ]
+        protocol:
+          - associated_layer_protocol: ipv4
+        trunk_mode: false
+        order: 3
+        management: false
+        allowed_address_pairs:
+          - ip_address: { get_input: UPP_NIC3_AADR_PAIRS }
+        #NFVO-TODO Openstack tested here doesnt have sriov support
+        #iface_type: direct   
+      requirements:
+        - virtual_binding: UPP
+
+
+
+########################
+# Policy configuration #
+########################
+  policies:
+    - scaling_aspects:
+        type: tosca.policies.nfv.ScalingAspects
+        properties:
+          aspects:
+            UPP:
+              name: 'UPP'
+              description: 'Controller tasks, Local context VPNMGR, System boot image and configuration storage on vHDD, etc.'
+              max_scale_level: 0
+
+    - instantiation_levels:
+        type: tosca.policies.nfv.InstantiationLevels
+        properties:
+          levels:
+            default:
+              description: 'Default instantiation level'
+              scale_info:
+                UPP:
+                  scale_level: 0
+          default_level: default
+
+######
+# UPP #
+######
+    - UPP_initial_delta:
+        type: tosca.policies.nfv.VduInitialDelta
+        properties:
+          initial_delta:
+            number_of_instances: 1
+        targets: [ UPP ]
+
+    - UPP_instantiation_levels:
+        type: tosca.policies.nfv.VduInstantiationLevels
+        properties:
+          levels:
+            default:
+              number_of_instances: 1
+        targets: [ UPP ]
+
+    - VIM_NETWORK_ORCH_SEC_GRP_0:
+        type: cisco.policies.nfv.SecurityGroupRule
+        group_name: { get_input: VIM_NETWORK_ORCH_SEC_GRP_0 }
+        targets: [ UPP_nic1 ]
+
+
