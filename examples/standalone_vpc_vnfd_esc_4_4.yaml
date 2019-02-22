@@ -327,6 +327,7 @@ topology_template:
         description: 'Vdu1 of an active:standby (1:1) redundant pair of CF VMs.'
         boot_order:
           - vnfd1-deployment-control-function-1-cf-boot
+          - vnfd1-deployment-control-function-1-cf-boot1
         configurable_properties:
           additional_vnfc_configurable_properties:
             vim_flavor: { get_input: VIM_FLAVOR_CF }
