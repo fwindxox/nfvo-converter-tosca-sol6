@@ -340,9 +340,9 @@ topology_template:
                   scale_level: 0
           default_level: default
 
-######
-# VM #
-######
+  ######
+  # VM #
+  ######
     - vm_initial_delta:
         type: tosca.policies.nfv.VduInitialDelta
         properties:
