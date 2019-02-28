@@ -1,0 +1,278 @@
+tosca_definitions_version: tosca_simple_profile_for_nfv_1_0_0_nokia
+
+topology_template:
+  substitution_mappings:
+    node_type: tosca.nodes.nfv.VNF
+    properties:
+      descriptor_id: repo_19.0_2.0
+      descriptor_version: 'repo_19.0_2.0'
+      provider: Nokia
+      product_name: REPOSERVER
+      software_version: '19.0'
+      product_info_name: CM/SW Repo
+      product_info_description: REPO VNF
+      vnfm_info:
+        - CBAM
+    requirements:
+      - virtual_link: [ oamCpd, external_virtual_link ]
+      - virtual_link: [ backupCpd, external_virtual_link ]
+    capabilities:
+      deployment_flavour:
+        properties:
+          description: ...
+          flavour_id: repo
+          instantiation_levels:
+            default:
+              description: ...
+              vdu_levels:
+                repo:
+                  number_of_instances: 2
+          default_instantiation_level_id: default
+          vdu_profile:
+            repo:
+              min_number_of_instances: 2
+              max_number_of_instances: 2
+      vnf:
+        properties:
+          modifiable_attributes:
+            extensions:
+              # NetAct Params
+              aif:
+                default: "yes"
+              RootDN:
+                default: "IMSNFM-1"
+              netact_mrname:
+                default: ""
+              netact_address:
+                default: ""
+              netact_port:
+                default: "22"
+              netact_user:
+                default: "omc"
+              netact_password:
+                default: ""
+              netact_plmn:
+                default: "PLMN-1"
+              netact_adaptation_release:
+                default: "base"
+              netact_ne_type:
+                default: "REPOSERVER"
+              repo01_netact_instancename:
+                default: "REPOSERVER-01"
+              repo02_netact_instancename:
+                default: "REPOSERVER-02"
+              http_port:
+                default: "8080"
+              https_port:
+                default: "8443"
+              ssh_port:
+                default: "22"
+              da_port:
+                default: "22"
+              da_metaDir:
+                default: "/global/esymac/Ines_o2ml"
+              ipVersion:
+                default: "0"
+              workingMode:
+                default: "1"
+              securityMode:
+                default: "0"
+              cafTraceHTTPMode:
+                default: "0"
+              cafTracePort:
+                default: "9880"
+              tspProcessNodeHTTPMode:
+                default: "0"
+              tspProcessNodePort:
+                default: "9099"
+              ne_version:
+                default: "19.0VI"
+              ReposerverHip:
+                default: ""
+              ReposerverHiphttpPort:
+                default: ""
+              ReposerverHiphttpsPort:
+                default: ""
+              ReposerverHipsecurityMode:
+                default: ""
+              DefPasswdRootUser:
+                default: ""
+              DefPasswdNonRootUsers:
+                default: ""                
+
+              storage_availability_zone1:
+                default: ""
+              storage_availability_zone2:
+                default: ""
+              vnf_name:
+                default: ""
+              dns_ip:
+                default: ""
+              release:
+                default: ""
+              default_gateway:
+                default: ""
+              repo01_name:
+                default: ""
+              repo02_name:
+                default: ""
+              volume_type:
+                default: ""
+              volume_size:
+                default: "60"
+              oam_netmask:
+                default: "255.255.255.0"
+              backup_netmask:
+                default: "255.255.255.0"
+              ntp_server_ip:
+                default: ""
+              time_zone:
+                default: "UTC"
+              PartnerNodeName:
+                default: ""
+              internal_network_ipversion:
+                default: ""
+              internal_netmask:
+                default: ""
+              internal_network_cidr:
+                default: ""
+              repo01_internal_ip:
+                default: ""
+              repo02_internal_ip:
+                default: ""
+              repo_internal_cipa_ip:
+                default: ""                
+
+    interfaces:
+      Basic:
+        instantiate:
+          inputs:
+            additional_parameters:
+              aif: "yes"
+        terminate:
+          inputs:
+            additional_parameters:
+              aif: "yes"  
+              
+      Custom:
+        netact_integrate:
+
+        netact_unintegrate:
+               
+  node_templates:
+    repo:
+      type: tosca.nodes.nfv.VDU
+      properties:
+        description: ..
+      requirements:
+        - virtual_compute: repoCompute
+        - sw_image: repoImage
+        - virtual_storage: repoDataVolume
+
+    repoDataVolume:
+      type: tosca.nodes.nfv.VirtualStorage
+      properties:
+        type_of_storage: volume
+        size_of_storage: 60 GB
+
+    repoCompute:
+      type: tosca.nodes.nfv.VirtualCompute
+      properties:
+        virtual_memory:
+            virtual_mem_size: 16384 MB
+        virtual_cpu:
+            cpu_architecture: x86
+            num_virtual_cpu: 8
+            virtual_cpu_clock: 2100 MHz
+
+    repoImage:
+      type: tosca.nodes.nfv.SwImage
+      properties:
+        name: REPO Image
+        version: 1.0
+        container_format: qcow2
+        checksum: 835fd4c0c5f8abadc1593ba185ca18cb
+        min_disk: 38 GB
+        min_ram: 16384 MB
+        size: 3 GB
+        disk_format: bare
+        sw_image: repo.qcow2
+        operating_system: Linux
+        supported_virtualisation_environments:
+          - KVM
+
+    oamICpd:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv4
+        role: leaf
+        description: External connection point
+      requirements:
+        - virtual_binding: repo
+
+    backupICpd:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv4
+        role: leaf
+        description: External connection point
+      requirements:
+        - virtual_binding: repo
+
+        
+    internalCpd:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv4
+        role: leaf
+        description: connection point
+      requirements:
+        - virtual_binding: repo
+        - virtual_link: internalNetworkVl         
+        
+    oamMovingCpd:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv4
+        role: leaf
+        description: Moving IP
+      requirements:        
+
+    internalMovingCpd:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv4
+        role: leaf
+        description: Moving IP
+      requirements:        
+
+    oamCpd:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv4
+        role: leaf
+        description: External connection point
+      requirements:
+        - internal_connection_point: oamICpd
+
+    backupCpd:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv4
+        role: leaf
+        description: External connection point
+      requirements:
+        - internal_connection_point: backupICpd
+      
+    internalNetworkVl:
+      type: tosca.nodes.nfv.VL
+      properties:
+        connectivity_type:
+          layer_protocol: ipv4
+          flow_pattern: mesh
+        test_access: []
+        description: ..
+        vl_flavours: {}      
+        
+  policies:
+
