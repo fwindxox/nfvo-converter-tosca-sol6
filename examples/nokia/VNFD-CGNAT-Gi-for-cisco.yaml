@@ -1,0 +1,361 @@
+tosca_definitions_version: tosca_simple_profile_for_nfv_1_0_0_nokia_3_4_0
+
+topology_template:
+
+  substitution_mappings:
+    node_type: tosca.nodes.nfv.VNF
+    properties:
+      descriptor_id: 'F5~BIG-IP-GiService~1.0'
+      descriptor_version: 'GiService-1.0'
+      provider: F5 Networks
+      product_name: F5 BIG-IP
+      software_version: '14.0.0'
+      vnfm_info:
+        - CBAM
+    requirements:
+      - virtual_link: [ cgn_mgmt_ecp, external_virtual_link ]
+      - virtual_link: [ cgn_nat_log_ecp, external_virtual_link ]
+      - virtual_link: [ cgn_ue_side1_ecp, external_virtual_link ]
+      - virtual_link: [ cgn_ue_side2_ecp, external_virtual_link ]
+      - virtual_link: [ cgn_in_side1_ecp, external_virtual_link ]
+      - virtual_link: [ cgn_in_side2_ecp, external_virtual_link ]
+      - virtual_link: [ cgn_to_abr_vas_ecp, external_virtual_link ]
+      - virtual_link: [ cgn_from_abr_vas_ecp, external_virtual_link ]
+      - virtual_link: [ abr_mgmt_ecp, external_virtual_link ]
+      - virtual_link: [ abr_to_cgn_vas_ecp, external_virtual_link ]
+      - virtual_link: [ abr_from_cgn_vas_ecp, external_virtual_link ]
+
+    capabilities:
+      deployment_flavour:
+        properties:
+          flavour_id: default
+          description: ..
+          instantiation_levels:
+            default:
+              description: ..
+              vdu_levels:
+                cgn:
+                  number_of_instances: 1
+                abr:
+                  number_of_instances: 1
+          default_instantiation_level_id: default
+          vdu_profile:
+            cgn:
+              min_number_of_instances: 1
+              max_number_of_instances: 1
+            abr:
+              min_number_of_instances: 1
+              max_number_of_instances: 1
+
+      vnf:
+        properties:
+          modifiable_attributes:
+            extensions:
+              cgn_host_name:
+                default: UHN3tld1f5cg0000
+              abr_host_name:
+                default: UHN3tld1f5ab0000
+              vnf_name:
+                default: UHN3tld1f501
+              bigip_admin_pwd:
+                default: admin
+              bigip_root_pwd:
+                default: default
+              bigip_default_gateway:
+                default: "2a00:8a00:a0ff::3e7f"
+              bigip_domain_name:
+                default: rmn.local
+              bigip_servers_dns:
+                default:
+                  - 2a00:8a00:a0ff::41
+              bigip_servers_ntp:
+                default:
+                  - 2a00:8a00:a0ff::41
+              bigip_timezone:
+                default: Asia/Tokyo
+              bigip_license_key:
+                default: ""
+              bigip_addon_license_keys:
+                default: []
+              bigip_licensing_type:
+                default: LICENSE_POOL
+              bigiq_host:
+                default: "2a00:8a00:a0ff::3e45"
+              bigiq_user:
+                default: admin
+              bigiq_password:
+                default: admin
+              bigip_license_pool_name:
+                default: Pool1
+              bigip_vlan_mtus:
+                default:
+                  - "1500"
+                  - "1500"
+                  - "1500"
+                  - "1500"
+                  - "1500"
+                  - "1500"
+                  - "1500"
+                  - "1500"
+                  - "1500"
+                  - "1500"
+                  - "1500"
+                  - "1500"
+                  - "1500"
+                  - "1500"
+              bigip_remote_hosts_ips:
+                default: []
+              bigip_remote_hosts_names:
+                default: []
+              bigip_self_port_lockdowns:
+                default: []
+              libs_proxy_addtl_opts:
+                default: "-L"
+              libs_proxy_auth:
+                default: ""
+              libs_proxy_host:
+                default: ""
+              libs_proxy_port:
+                default: ""
+              libs_proxy_protocol:
+                default: http
+              os_heat_wc_notify_options:
+                default: "-k -v"
+              wait_for_heat_signal:
+                default: true
+              f5_cloudlibs_tag:
+                default: ""
+              f5_cloudlibs_url_override:
+                default: ""
+              f5_cloudlibs_verify_hash_url_override:
+                default: ""
+
+    interfaces:
+      Basic:
+        instantiate:
+        terminate:
+
+  node_templates:
+    cgn:
+      type: tosca.nodes.nfv.VDU
+      properties:
+        description: ...
+      requirements:
+        - virtual_compute: cgn_compute
+        - sw_image: cgn_image
+
+    abr:
+      type: tosca.nodes.nfv.VDU
+      properties:
+        description: ...
+      requirements:
+        - virtual_compute: abr_compute
+        - sw_image: abr_image
+
+    cgn_compute:
+      type: tosca.nodes.nfv.VirtualCompute
+      properties:
+        virtual_memory:
+          virtual_mem_size: 36 GB
+        virtual_cpu:
+          cpu_architecture: x86
+          num_virtual_cpu: 18
+          virtual_cpu_clock: 1800 MHz
+
+    abr_compute:
+      type: tosca.nodes.nfv.VirtualCompute
+      properties:
+        virtual_memory:
+          virtual_mem_size: 32 GB
+        virtual_cpu:
+          cpu_architecture: x86
+          num_virtual_cpu: 16
+          virtual_cpu_clock: 1800 MHz
+
+    cgn_image:
+      type: tosca.nodes.nfv.SwImage
+      properties:
+        sw_image: BIGIP-14.0.0-0.0.2187
+        checksum: f3aa2d51d82fa3f5a4fa10005a378e16
+        name: F5 BIGIP Image
+        version: 1.0
+        container_format: bare
+        disk_format: qcow2
+        min_disk: 80 GB
+        size: 4.2 GB
+
+    abr_image:
+      type: tosca.nodes.nfv.SwImage
+      properties:
+        sw_image: BIGIP-14.0.0-0.0.2187
+        checksum: f3aa2d51d82fa3f5a4fa10005a378e16
+        name: F5 BIGIP Image
+        version: 1.0
+        container_format: bare
+        disk_format: qcow2
+        min_disk: 80 GB
+        size: 4.2 GB
+
+    ######################
+    #   CGN Networks     #
+    ######################
+
+    cgn_mgmt_icp:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - virtual_binding: cgn
+
+    cgn_mgmt_ecp:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - internal_connection_point: cgn_mgmt_icp
+
+    cgn_nat_log_icp:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - virtual_binding: cgn
+
+    cgn_nat_log_ecp:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - internal_connection_point: cgn_nat_log_icp
+
+    cgn_ue_side1_icp:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - virtual_binding: cgn
+
+    cgn_ue_side1_ecp:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - internal_connection_point: cgn_ue_side1_icp
+
+    cgn_ue_side2_icp:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - virtual_binding: cgn
+
+    cgn_ue_side2_ecp:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - internal_connection_point: cgn_ue_side2_icp
+
+    cgn_in_side1_icp:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - virtual_binding: cgn
+
+    cgn_in_side1_ecp:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - internal_connection_point: cgn_in_side1_icp
+
+    cgn_in_side2_icp:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - virtual_binding: cgn
+
+    cgn_in_side2_ecp:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - internal_connection_point: cgn_in_side2_icp
+
+    cgn_to_abr_vas_icp:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - virtual_binding: cgn
+
+    cgn_to_abr_vas_ecp:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - internal_connection_point: cgn_to_abr_vas_icp
+
+    cgn_from_abr_vas_icp:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - virtual_binding: cgn
+
+    cgn_from_abr_vas_ecp:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - internal_connection_point: cgn_from_abr_vas_icp
+
+    ######################
+    #   ABR Networks     #
+    ######################
+
+    abr_mgmt_icp:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - virtual_binding: abr
+
+    abr_mgmt_ecp:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - internal_connection_point: abr_mgmt_icp
+
+    abr_to_cgn_vas_icp:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - virtual_binding: abr
+
+    abr_to_cgn_vas_ecp:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - internal_connection_point: abr_to_cgn_vas_icp
+
+    abr_from_cgn_vas_icp:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - virtual_binding: abr
+
+    abr_from_cgn_vas_ecp:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - internal_connection_point: abr_from_cgn_vas_icp
+
+  policies:
