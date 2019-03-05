@@ -1498,7 +1498,7 @@ topology_template:
         virtual_cpu:
             cpu_architecture: x86
             num_virtual_cpu: 2
-            virtual_cpu_clock: 1800 MHzƒ
+            virtual_cpu_clock: 1800 MHz
 
     DDEAPPImage:
       type: tosca.nodes.nfv.SwImage

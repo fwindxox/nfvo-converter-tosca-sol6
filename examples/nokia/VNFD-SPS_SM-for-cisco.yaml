@@ -1,0 +1,724 @@
+tosca_definitions_version: tosca_simple_profile_for_nfv_1_0_0_nokia_3_2_0
+metadata:
+  cbam_ansible_version: 'v2.1.4.0-1'
+
+topology_template:
+  substitution_mappings:
+    node_type: tosca.nodes.nfv.VNF
+    properties:
+      descriptor_id: Nokia~SPS-SM~18_9_R1_I142~1.0.0_OpenStack
+      descriptor_version: '1.0.0 OpenStack'
+      provider: Nokia
+      product_name: 'SPS-SM'
+      software_version: '18_9_R1_I142'
+      product_info_name: 'CBAM package for SPS-SM'
+      vnfm_info:
+        - CBAM
+    requirements:
+      - virtual_link: [ ni1-SPS-ME-OAM-L3BD_SMApp_1_ECP, external_virtual_link ]
+      - virtual_link: [ ni1-SPS-ME-OAM-L3BD_OAME_1_ECP, external_virtual_link ]
+      - virtual_link: [ ni1-SPS-ME-OAM-L3BD_IOHO_1_ECP, external_virtual_link ]
+    capabilities:
+      deployment_flavour:
+        properties:
+          flavour_id: scalable
+          description: ...
+          scaling_aspects:
+            SMAppAspect:
+              name: ..
+              description: ..
+              associated_group: SMAppScalingGroup
+              max_scale_level: 80
+            OAMEAspect:
+              name: ..
+              description: ..
+              associated_group: OAMEScalingGroup
+              max_scale_level: 2
+            DBAspect:
+              name: ..
+              description: ..
+              associated_group: DBScalingGroup
+              max_scale_level: 80
+            AuxiliaryAspect:
+              name: ..
+              description: ..
+              associated_group: AuxiliaryScalingGroup
+              max_scale_level: 20
+            IOHOAspect:
+              name: ..
+              description: ..
+              associated_group: IOHOScalingGroup
+              max_scale_level: 2
+          instantiation_levels:
+            basic:
+              description: Basic VNF size for SPS-SM
+              vdu_levels:
+                SMApp:
+                  number_of_instances: 2
+                Auxiliary:
+                  number_of_instances: 5
+                DB:
+                  number_of_instances: 4
+                OAME:
+                  number_of_instances: 2
+                IOHO:
+                  number_of_instances: 2
+              scale_info:
+                SMAppAspect:
+                  scale_level: 2
+                AuxiliaryAspect:
+                  scale_level: 5
+                DBAspect:
+                  scale_level: 4
+                OAMEAspect:
+                  scale_level: 2
+                IOHOAspect:
+                  scale_level: 2
+          default_instantiation_level_id: basic
+          vdu_profile:
+            SMApp:
+              min_number_of_instances: 1
+              max_number_of_instances: 80
+            OAME:
+              min_number_of_instances: 1
+              max_number_of_instances: 2
+            DB:
+              min_number_of_instances: 1
+              max_number_of_instances: 80
+            Auxiliary:
+              min_number_of_instances: 3
+              max_number_of_instances: 20
+            IOHO:
+              min_number_of_instances: 1
+              max_number_of_instances: 2
+      vnf:
+        properties:
+          configurable_properties:
+            operation_triggers:
+              auto_heal:
+                period_in_seconds: 660
+                enabled: false
+              auto_scale:
+                period_in_seconds: 1020
+                enabled: false
+          modifiable_attributes:
+            extensions:
+              vnf_network_config:
+                default: Reserved
+              sps_auxiliary_mod:
+                default: "cinder"
+              ntp_servers:
+                default: "240b:c010:0101:5443::ffff,4,y|240b:c010:0101:541d::ffff,4,n"
+              time_zone:
+                default: "Asia/Tokyo"
+              hostname_prefix:
+                default: "UHN3tli1sssm0001"
+              sdc_config_data:
+                default: {}
+              localize_and_start_sps:
+                default: "true"
+              vnf_name:
+                default: "uhn3tli1ss01"
+
+    interfaces:
+      Basic:
+        instantiate:
+        terminate:
+      Scalable:
+        scale:
+          inputs:
+            additional_parameters:
+              ForceScaleIn: "no"
+              vnfcNameToScaleIn: ""
+
+      Custom:
+        backup:
+          inputs:
+            additional_parameters:
+              nodes_info: "ALL"
+        schedule_backup:
+          inputs:
+            additional_parameters:
+              schedule_action: ""
+              schedule_time: ""
+        restore:
+          inputs:
+            additional_parameters:
+              restore_version: ""
+        healone:
+          inputs:
+            additional_parameters:
+              vm_name: ""
+              rebuild_vm: "no"
+        imagesu_apply_group:
+          inputs:
+            additional_parameters:
+              jump_host: "none"
+              new_components: "none"
+              node_type: ""
+              vm_instance: ""
+        imagesu_backout_group:
+          inputs:
+            additional_parameters:
+              jump_host: "none"
+              node_type: ""
+              vm_instance: ""
+        imagesu_backout_prepare_group:
+          inputs:
+            additional_parameters:
+              jump_host: "none"
+              node_type: ""
+              vm_instance: ""
+        imagesu_commit_group:
+          inputs:
+            additional_parameters:
+              convert_to_name: "yes"
+              image_infos: ""
+              jump_host: "none"
+              node_type: ""
+              vm_instance: ""
+              vdus: ""
+        imagesu_prepare_group:
+          inputs:
+            additional_parameters:
+              jump_host: "none"
+              node_type: ""
+              vm_instance: ""
+        imagesu_start_service_group:
+          inputs:
+            additional_parameters:
+              jump_host: "none"
+              node_type: ""
+              vm_instance: ""
+        imagesu_update_stack:
+          inputs:
+            additional_parameters:
+              aspect_groups: ""
+              convert_to_name: "yes"
+              image_infos: ""
+        load_new_configuration:
+          inputs:
+            additional_parameters:
+              jump_host: "none"
+              vm_instance: ""
+        set_db_persisted_version:
+          inputs:
+            additional_parameters:
+              oam_vdu_name: ""
+        switch_over_one_instance:
+          inputs:
+            additional_parameters:
+              vdu_name: ""
+              server_index: ""
+              jump_host: "none"
+        execute_specific_ansible:
+          inputs:
+            additional_parameters:
+              vdu_name: ""
+              server_index: ""
+              jump_host: "none"
+              ansible: ""
+        recovery:
+          inputs:
+            additional_parameters:
+              restore_version: ""
+        updateconfiguration:
+        imagesu_sdc_migrate_data:
+        imagesu_apply:
+          inputs:
+            additional_parameters:
+              node_type: ""
+              jump_host: "none"
+              group_name: ""
+              vm_list: ""
+              new_components: "none"
+              load_new_configuration: "no"
+        imagesu_commit:
+          inputs:
+            additional_parameters:
+              vdu_name: ""
+        imagesu_backout:
+          inputs:
+            additional_parameters:
+              vdu_name: ""
+              group_name: ""
+        manage_account:
+          inputs:
+            additional_parameters:
+              vdu_names: ""
+              jump_host: "none"
+              action: "add"
+              name: "none"
+              shell: "/bin/bash"
+              description: "none"
+              primary_group: "none"
+              groups: "none"
+              home: "none"
+              remove_home: "no"
+              password: "none"
+              password_expire_days: "none"
+
+  node_templates:
+    SMApp:
+      type: tosca.nodes.nfv.VDU
+      properties:
+        description: SMApp template
+        configurable_properties:
+          additional_vnfc_configurable_properties: {}
+      requirements:
+        - virtual_compute: SMAppCompute
+        - sw_image: SMAppImage
+        - virtual_storage: SMApp1Volume
+        - virtual_storage: SMApp2Volume
+        - virtual_storage: SMApp3Volume
+
+    SMAppCompute:
+      type: tosca.nodes.nfv.VirtualCompute
+      properties:
+        virtual_memory:
+            virtual_mem_size: 6144 MB
+        virtual_cpu:
+            cpu_architecture: x86
+            num_virtual_cpu: 2
+            virtual_cpu_clock: 1800 MHz
+
+    SMAppImage:
+      type: tosca.nodes.nfv.SwImage
+      properties:
+        name: SMApp image
+        version: 1.0
+        checksum: 687251fdf233b0d5319307f21162075d
+        container_format: qcow2
+        disk_format: bare
+        min_disk: 50 GB
+        min_ram: 1024 MB
+        size: 3 GB
+        sw_image: fake_image
+        operating_system: Linux
+        supported_virtualisation_environments:
+          - KVM
+
+
+    SMApp1Volume:
+      type: tosca.nodes.nfv.VirtualStorage
+      properties:
+        type_of_storage: volume
+        size_of_storage: 20 GB
+
+    SMApp2Volume:
+      type: tosca.nodes.nfv.VirtualStorage
+      properties:
+        type_of_storage: volume
+        size_of_storage: 20 GB
+
+    SMApp3Volume:
+      type: tosca.nodes.nfv.VirtualStorage
+      properties:
+        type_of_storage: volume
+        size_of_storage: 20 GB
+
+    SMApp_1_ni1-SPS-ME-OAM-L3BD_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv6
+        role: leaf
+        description: External connection point on IPV6
+      requirements:
+        - virtual_binding: SMApp
+
+    SMApp_0_internal_network_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv4
+        role: leaf
+        description: Internal connection point on IPV4
+      requirements:
+        - virtual_binding: SMApp
+        - virtual_link: VL_internal_network
+
+
+    ni1-SPS-ME-OAM-L3BD_SMApp_1_ECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - internal_connection_point: SMApp_1_ni1-SPS-ME-OAM-L3BD_CP
+
+    OAME:
+      type: tosca.nodes.nfv.VDU
+      properties:
+        description: OAME template
+        configurable_properties:
+          additional_vnfc_configurable_properties: {}
+      requirements:
+        - virtual_compute: OAMECompute
+        - sw_image: OAMEImage
+        - virtual_storage: OAME1Volume
+        - virtual_storage: OAME2Volume
+        - virtual_storage: OAME3Volume
+
+    OAMECompute:
+      type: tosca.nodes.nfv.VirtualCompute
+      properties:
+        virtual_memory:
+            virtual_mem_size: 6144 MB
+        virtual_cpu:
+            cpu_architecture: x86
+            num_virtual_cpu: 2
+            virtual_cpu_clock: 1800 MHz
+
+    OAMEImage:
+      type: tosca.nodes.nfv.SwImage
+      properties:
+        name: OAME image
+        version: 1.0
+        checksum: 687251fdf233b0d5319307f21162075d
+        container_format: qcow2
+        disk_format: bare
+        min_disk: 50 GB
+        min_ram: 1024 MB
+        size: 3 GB
+        sw_image: fake_image
+        operating_system: Linux
+        supported_virtualisation_environments:
+          - KVM
+
+
+    OAME1Volume:
+      type: tosca.nodes.nfv.VirtualStorage
+      properties:
+        type_of_storage: volume
+        size_of_storage: 300 GB
+
+    OAME2Volume:
+      type: tosca.nodes.nfv.VirtualStorage
+      properties:
+        type_of_storage: volume
+        size_of_storage: 350 GB
+
+    OAME3Volume:
+      type: tosca.nodes.nfv.VirtualStorage
+      properties:
+        type_of_storage: volume
+        size_of_storage: 50 GB
+
+    OAME_1_ni1-SPS-ME-OAM-L3BD_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv6
+        role: leaf
+        description: External connection point on IPV6
+      requirements:
+        - virtual_binding: OAME
+
+    OAME_0_internal_network_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv4
+        role: leaf
+        description: Internal connection point on IPV4
+      requirements:
+        - virtual_binding: OAME
+        - virtual_link: VL_internal_network
+
+    OAME_0_internal_network_moving_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv4
+      requirements:
+
+    OAME_1_ni1-SPS-ME-OAM-L3BD_moving_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv6
+        role: leaf
+        description: Moving External connection point on IPV6
+      requirements:
+        - virtual_binding: OAME
+
+    ni1-SPS-ME-OAM-L3BD_OAME_1_ECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - internal_connection_point: OAME_1_ni1-SPS-ME-OAM-L3BD_CP
+
+    ni1-SPS-ME-OAM-L3BD_OAME_1_MovingECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - internal_connection_point: OAME_1_ni1-SPS-ME-OAM-L3BD_moving_CP
+
+    DB:
+      type: tosca.nodes.nfv.VDU
+      properties:
+        description: DB template
+        configurable_properties:
+          additional_vnfc_configurable_properties: {}
+      requirements:
+        - virtual_compute: DBCompute
+        - sw_image: DBImage
+        - virtual_storage: DB1Volume
+        - virtual_storage: DB2Volume
+        - virtual_storage: DB3Volume
+        - virtual_storage: DB4Volume
+
+    DBCompute:
+      type: tosca.nodes.nfv.VirtualCompute
+      properties:
+        virtual_memory:
+            virtual_mem_size: 6144 MB
+        virtual_cpu:
+            cpu_architecture: x86
+            num_virtual_cpu: 2
+            virtual_cpu_clock: 1800 MHz
+
+    DBImage:
+      type: tosca.nodes.nfv.SwImage
+      properties:
+        name: DB image
+        version: 1.0
+        checksum: 687251fdf233b0d5319307f21162075d
+        container_format: qcow2
+        disk_format: bare
+        min_disk: 50 GB
+        min_ram: 1024 MB
+        size: 3 GB
+        sw_image: fake_image
+        operating_system: Linux
+        supported_virtualisation_environments:
+          - KVM
+
+
+    DB1Volume:
+      type: tosca.nodes.nfv.VirtualStorage
+      properties:
+        type_of_storage: volume
+        size_of_storage: 5 GB
+
+    DB2Volume:
+      type: tosca.nodes.nfv.VirtualStorage
+      properties:
+        type_of_storage: volume
+        size_of_storage: 250 GB
+
+    DB3Volume:
+      type: tosca.nodes.nfv.VirtualStorage
+      properties:
+        type_of_storage: volume
+        size_of_storage: 5 GB
+
+    DB4Volume:
+      type: tosca.nodes.nfv.VirtualStorage
+      properties:
+        type_of_storage: volume
+        size_of_storage: 40 GB
+
+    DB_0_internal_network_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv4
+        role: leaf
+        description: Internal connection point on IPV4
+      requirements:
+        - virtual_binding: DB
+        - virtual_link: VL_internal_network
+
+
+    Auxiliary:
+      type: tosca.nodes.nfv.VDU
+      properties:
+        description: Auxiliary template
+        configurable_properties:
+          additional_vnfc_configurable_properties: {}
+      requirements:
+        - virtual_compute: AuxiliaryCompute
+        - sw_image: AuxiliaryImage
+        - virtual_storage: Auxiliary1Volume
+        - virtual_storage: Auxiliary2Volume
+
+    AuxiliaryCompute:
+      type: tosca.nodes.nfv.VirtualCompute
+      properties:
+        virtual_memory:
+            virtual_mem_size: 8192 MB
+        virtual_cpu:
+            cpu_architecture: x86
+            num_virtual_cpu: 4
+            virtual_cpu_clock: 1800 MHz
+
+    AuxiliaryImage:
+      type: tosca.nodes.nfv.SwImage
+      properties:
+        name: Auxiliary image
+        version: 1.0
+        checksum: 687251fdf233b0d5319307f21162075d
+        container_format: qcow2
+        disk_format: bare
+        min_disk: 50 GB
+        min_ram: 1024 MB
+        size: 3 GB
+        sw_image: fake_image
+        operating_system: Linux
+        supported_virtualisation_environments:
+          - KVM
+
+
+    Auxiliary1Volume:
+      type: tosca.nodes.nfv.VirtualStorage
+      properties:
+        type_of_storage: volume
+        size_of_storage: 20 GB
+
+    Auxiliary2Volume:
+      type: tosca.nodes.nfv.VirtualStorage
+      properties:
+        type_of_storage: volume
+        size_of_storage: 10 GB
+
+    Auxiliary_0_internal_network_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv4
+        role: leaf
+        description: Internal connection point on IPV4
+      requirements:
+        - virtual_binding: Auxiliary
+        - virtual_link: VL_internal_network
+
+
+    IOHO:
+      type: tosca.nodes.nfv.VDU
+      properties:
+        description: IOHO template
+        configurable_properties:
+          additional_vnfc_configurable_properties: {}
+      requirements:
+        - virtual_compute: IOHOCompute
+        - sw_image: IOHOImage
+        - virtual_storage: IOHO1Volume
+        - virtual_storage: IOHO2Volume
+
+    IOHOCompute:
+      type: tosca.nodes.nfv.VirtualCompute
+      properties:
+        virtual_memory:
+            virtual_mem_size: 6144 MB
+        virtual_cpu:
+            cpu_architecture: x86
+            num_virtual_cpu: 2
+            virtual_cpu_clock: 1800 MHz
+
+    IOHOImage:
+      type: tosca.nodes.nfv.SwImage
+      properties:
+        name: IOHO image
+        version: 1.0
+        checksum: 687251fdf233b0d5319307f21162075d
+        container_format: qcow2
+        disk_format: bare
+        min_disk: 50 GB
+        min_ram: 1024 MB
+        size: 3 GB
+        sw_image: fake_image
+        operating_system: Linux
+        supported_virtualisation_environments:
+          - KVM
+
+
+    IOHO1Volume:
+      type: tosca.nodes.nfv.VirtualStorage
+      properties:
+        type_of_storage: volume
+        size_of_storage: 20 GB
+
+    IOHO2Volume:
+      type: tosca.nodes.nfv.VirtualStorage
+      properties:
+        type_of_storage: volume
+        size_of_storage: 20 GB
+
+
+    IOHO_1_ni1-SPS-ME-OAM-L3BD_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv6
+        role: leaf
+        description: External connection point on IPV6
+      requirements:
+        - virtual_binding: IOHO
+
+    IOHO_0_internal_network_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv4
+        role: leaf
+        description: Internal connection point on IPV4
+      requirements:
+        - virtual_binding: IOHO
+        - virtual_link: VL_internal_network
+
+    IOHO_0_internal_network_moving_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv4
+      requirements:
+
+    IOHO_1_ni1-SPS-ME-OAM-L3BD_moving_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv6
+        role: leaf
+        description: Moving External connection point on IPV6
+      requirements:
+        - virtual_binding: IOHO
+
+    ni1-SPS-ME-OAM-L3BD_IOHO_1_ECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - internal_connection_point: IOHO_1_ni1-SPS-ME-OAM-L3BD_CP
+
+    ni1-SPS-ME-OAM-L3BD_IOHO_1_MovingECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - internal_connection_point: IOHO_1_ni1-SPS-ME-OAM-L3BD_moving_CP
+
+    VL_internal_network:
+      type: tosca.nodes.nfv.VL
+      properties:
+        connectivity_type:
+          layer_protocol: ipv4
+          flow_pattern: mesh
+        test_access: []
+        description: ..
+        vl_flavours: {}
+
+
+  groups:
+    SMAppScalingGroup:
+      type: tosca.groups.nfv.ElementGroup
+      description: ..
+      members: [ SMApp ]
+    OAMEScalingGroup:
+      type: tosca.groups.nfv.ElementGroup
+      description: ..
+      members: [ OAME ]
+    DBScalingGroup:
+      type: tosca.groups.nfv.ElementGroup
+      description: ..
+      members: [ DB ]
+    AuxiliaryScalingGroup:
+      type: tosca.groups.nfv.ElementGroup
+      description: ..
+      members: [ Auxiliary ]
+    IOHOScalingGroup:
+      type: tosca.groups.nfv.ElementGroup
+      description: ..
+      members: [ IOHO ]
+
+  policies:
