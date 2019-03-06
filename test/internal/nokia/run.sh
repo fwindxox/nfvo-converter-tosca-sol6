@@ -13,6 +13,6 @@ example_root=$root/examples/nokia
 for filename in $example_root/*.yaml; do
     file=$(basename $filename)
     echo Run $file
-    python3 $tosca -f $filename -o "$output_dir/${file%.yaml}.json" -c $config_tosca -s $config_sol6
+    python3 $tosca -f $filename -o "$output_dir/${file%.yaml}.json" -c $config_tosca -s $config_sol6 -r "nokia"
 done
 
