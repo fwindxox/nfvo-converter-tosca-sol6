@@ -1,0 +1,1818 @@
+#////////////////////////////////////////////////////////////
+#/
+#/ File: vnfd.scalable.tosca.yaml
+#/
+#////////////////////////////////////////////////////////////
+#/
+#/ Author: mehar
+#/
+#/ Nokia - Confidential
+#/ Do not use, distribute, or copy without consent of Nokia.
+#/ Copyright (c) 2017 Nokia. All rights reserved.
+#/
+#////////////////////////////////////////////////////////////
+#**************************************************************************
+# This VNFD describes DDE NE VNF scalable templates.
+#
+#**************************************************************************
+
+tosca_definitions_version: tosca_simple_profile_for_nfv_1_0_0_nokia
+
+description: DDE bvnf TOSCA template, 2 OAM, 2 DDEIO, 2 DDEAPP, 2 DB (medium)
+
+topology_template:
+  substitution_mappings:
+    node_type: tosca.nodes.nfv.VNF
+    properties:
+      descriptor_id: CSD_18_8_I155_CSD_NO_DHCP_IPV6_OAM_IO_GEO_totlb
+      descriptor_version: '1.0'
+      provider: Nokia
+      product_name: CSD_18_8_I155
+      software_version: 'CSD_18_8_I155_CSD_NO_DHCP_IPV6_OAM_IO_GEO_totlb'
+      product_info_name: CSD_18_8_I155
+      vnfm_info:
+        - CBAM
+    requirements:
+      - virtual_link: [ external_IPv6_DDEIO_1_ECP, external_virtual_link ]
+      - virtual_link: [ external_IPv6_OAM_1_ECP, external_virtual_link ]
+      - virtual_link: [ external_IPv4_OAM_1_ECP, external_virtual_link ]
+      - virtual_link: [ external_IPv6_OAM_2BKP_ECP, external_virtual_link ]
+      - virtual_link: [ externalDB_IPv6_ECP, external_virtual_link ]
+      - virtual_link: [ external_IPv6_DDEIO_2_ECP, external_virtual_link ]
+      - virtual_link: [ external_IPv6_DDEIO_3_ECP, external_virtual_link ]
+      - virtual_link: [ external_IPv6_DDEIO_4_ECP, external_virtual_link ]
+      - virtual_link: [ external_IPv6_DDEIO_5_ECP, external_virtual_link ]
+      - virtual_link: [ external_IPv6_DDEIO_6_ECP, external_virtual_link ]
+      - virtual_link: [ external_IPv6_DDEIO_7_ECP, external_virtual_link ]
+      - virtual_link: [ external_IPv6_DDEIO_8_ECP, external_virtual_link ]
+      - virtual_link: [ external_IPv6_DDEIO_9_ECP, external_virtual_link ]
+      - virtual_link: [ external_IPv6_DDEIO_10_ECP, external_virtual_link ]
+      - virtual_link: [ external_IPv6_DDEIO_11_ECP, external_virtual_link ]
+      - virtual_link: [ external_IPv6_DDEIO_12_ECP, external_virtual_link ]
+      - virtual_link: [ external_IPv6_DDEIO_13_ECP, external_virtual_link ]
+      - virtual_link: [ external_IPv6_DDEIO_14_ECP, external_virtual_link ]
+      - virtual_link: [ external_IPv6_DDEIO_15_ECP, external_virtual_link ]
+      - virtual_link: [ external_IPv6_DDEIO_16_ECP, external_virtual_link ]
+      - virtual_link: [ external_IPv6_DDEIO_17_ECP, external_virtual_link ]
+      - virtual_link: [ external_IPv6_DDEIO_18_ECP, external_virtual_link ]
+      - virtual_link: [ external_IPv6_DDEIO_19_ECP, external_virtual_link ]
+      - virtual_link: [ external_IPv6_DDEIO_20_ECP, external_virtual_link ]      
+      - virtual_link: [ external_IPv4_DDEIO_1_ECP, external_virtual_link ]
+      - virtual_link: [ external_IPv4_DDEIO_2_ECP, external_virtual_link ]
+      - virtual_link: [ external_IPv4_DDEIO_3_ECP, external_virtual_link ]
+      - virtual_link: [ external_IPv4_DDEIO_4_ECP, external_virtual_link ]
+      - virtual_link: [ external_IPv4_DDEIO_5_ECP, external_virtual_link ]
+      - virtual_link: [ external_IPv4_DDEIO_6_ECP, external_virtual_link ]
+      - virtual_link: [ external_IPv4_DDEIO_7_ECP, external_virtual_link ]
+      - virtual_link: [ external_IPv4_DDEIO_8_ECP, external_virtual_link ]
+      - virtual_link: [ external_IPv4_DDEIO_9_ECP, external_virtual_link ]
+      - virtual_link: [ external_IPv4_DDEIO_10_ECP, external_virtual_link ]
+      - virtual_link: [ external_IPv4_DDEIO_11_ECP, external_virtual_link ]
+      - virtual_link: [ external_IPv4_DDEIO_12_ECP, external_virtual_link ]
+      - virtual_link: [ external_IPv4_DDEIO_13_ECP, external_virtual_link ]
+      - virtual_link: [ external_IPv4_DDEIO_14_ECP, external_virtual_link ]
+      - virtual_link: [ external_IPv4_DDEIO_15_ECP, external_virtual_link ]
+      - virtual_link: [ external_IPv4_DDEIO_16_ECP, external_virtual_link ]
+      - virtual_link: [ external_IPv4_DDEIO_17_ECP, external_virtual_link ]
+      - virtual_link: [ external_IPv4_DDEIO_18_ECP, external_virtual_link ]
+      - virtual_link: [ external_IPv4_DDEIO_19_ECP, external_virtual_link ]
+      - virtual_link: [ external_IPv4_DDEIO_20_ECP, external_virtual_link ]      
+    capabilities:
+      deployment_flavour:
+        properties:
+          flavour_id: scalable
+          description: ...
+          scaling_aspects:
+            DDEIOAspect:
+              name: ..
+              description: ..
+              associated_group: DDEIOScalingGroup
+              max_scale_level: 2
+            DDEAPPAspect:
+              name: ..
+              description: ..
+              associated_group: DDEAPPScalingGroup
+              max_scale_level: 20
+            OAMAspect:
+              name: ..
+              description: ..
+              associated_group: OAMScalingGroup
+              max_scale_level: 2
+            DBAspect:
+              name: ..
+              description: ..
+              associated_group: DBScalingGroup
+              max_scale_level: 20
+          instantiation_levels:
+            small:
+              description: small
+              vdu_levels:
+                DDEAPP:
+                  number_of_instances: 2
+                DDEIO:
+                  number_of_instances: 2
+                OAM:
+                  number_of_instances: 2
+                DB:
+                  number_of_instances: 3
+              scale_info:
+                DDEAPPAspect:
+                  scale_level: 2
+                DDEIOAspect:
+                  scale_level: 2
+                OAMAspect:
+                  scale_level: 2
+                DBAspect:
+                  scale_level: 3
+            medium:
+              description: medium
+              vdu_levels:
+                DDEAPP:
+                  number_of_instances: 4
+                DDEIO:
+                  number_of_instances: 2
+                OAM:
+                  number_of_instances: 2
+                DB:
+                  number_of_instances: 3
+              scale_info:
+                DDEAPPAspect:
+                  scale_level: 4
+                DDEIOAspect:
+                  scale_level: 2
+                OAMAspect:
+                  scale_level: 2
+                DBAspect:
+                  scale_level: 3
+            large:
+              description: large
+              vdu_levels:
+                DDEAPP:
+                  number_of_instances: 8
+                DDEIO:
+                  number_of_instances: 2
+                OAM:
+                  number_of_instances: 2
+                DB:
+                  number_of_instances: 4
+              scale_info:
+                DDEAPPAspect:
+                  scale_level: 8
+                DDEIOAspect:
+                  scale_level: 2
+                OAMAspect:
+                  scale_level: 2
+                DBAspect:
+                  scale_level: 4
+          default_instantiation_level_id: medium
+          vdu_profile:
+            DDEIO:
+              min_number_of_instances: 2
+              max_number_of_instances: 2
+            DDEAPP:
+              min_number_of_instances: 1
+              max_number_of_instances: 20
+            OAM:
+              min_number_of_instances: 2
+              max_number_of_instances: 2
+            DB:
+              min_number_of_instances: 2
+              max_number_of_instances: 20
+      vnf:
+        properties:
+          modifiable_attributes:
+            extensions:
+              ansible_param:
+                default: {"ha_state_check_interval":2,"ha_state_check_max_retry":40,"wait_for_ssh":240}
+              sdc_config_data:
+                default: {}
+              internal_prefix:
+                default: "192.168.3"
+              xdrDigestLogFileSize:
+                default: "1G"
+              diameterHost:
+                default: "dra-lb01-uhn3tli1cd01"
+              app_data_volume:
+                default: "10"
+              snmp_version:
+                default: "1"
+              netact_user:
+                default: "null"
+              namespaceCfg:
+                default: "340M,340M,340M"
+              dbServerAddress:
+                default: "192.168.3.40,192.168.3.41,192.168.3.42"
+              diameterRealm:
+                default: "epc.mnc011.mcc440.3gppnetwork.org"
+              netact_password:
+                default: "null"
+              ne_hostname:
+                default: "UHN3tli1cdra0001"
+              db_datastore_volume:
+                default: "10"
+              oam_data_volume:
+                default: "10"
+              netact_mrname:
+                default: "null"
+              netact_adaptation_release:
+                default: "18.8"
+              addressGroup:
+                default: "n,TCP,3868,10.37.13.10 n,TCP,3868,2001:a3f:3713::a"
+              ne_agent_dn:
+                default: "null"
+              netact_port:
+                default: "22"
+              netact_ne_type:
+                default: "DDE"
+              vnf_network_config:
+                default: Reserved
+              hostname_prefix:
+                default: "UHN3tli1cdra0001"
+              netact_address:
+                default: "null"
+              app_log_volume:
+                default: "10"
+              aif:
+                default: "no"
+              ne_presentation_name:
+                default: "null"
+              geoSitename:
+                default: "totims1"
+              time_zone:
+                default: "Asia/Tokyo"
+              oam_log_volume:
+                default: "10"
+              config_data_url:
+                default: "null"
+              oam_backup_volume:
+                default: "20"
+              oam_prometheus_volume:
+                default: "20"
+              ioIps:
+                default: "192.168.3.20 192.168.3.21"
+              primarydns:
+                default: "240b:c010:0101:2830::3"
+              secondarydns:
+                default: "240b:c010:0101:2833::3"
+
+    interfaces:
+      Basic:
+        instantiate:
+        terminate:
+      Scalable:
+        scale:
+          inputs:
+            additional_parameters:
+              ForceScaleIn: "no"
+              vnfcNameToScaleIn: ""
+
+      Custom:
+        healone:
+          inputs:
+            additional_parameters:
+              vm_instance_id: ""
+              node_type: ""
+              action_type: ""
+
+        parallel_imagesu_apply:
+          inputs:
+            additional_parameters:
+              jump_host: "no"
+              jump_host_ip: ""
+              vdu_name: ""
+              node_type: ""
+              instance_ids: ""
+              image_id: ""
+              available_zone: ""
+              new_components: "none"
+              load_new_configuration: "no"
+
+        UpdateDictionary:
+        addroute:
+          inputs:
+            additional_parameters:
+              route_name: ""
+              node_type: ""
+              network: ""
+              gateway: "default"
+              ethinterface: ""                
+
+  node_templates:
+    DDEIO:
+      type: tosca.nodes.nfv.VDU
+      properties:
+        description: DDEIO template
+        configurable_properties:
+          additional_vnfc_configurable_properties: {}
+      requirements:
+        - virtual_compute: DDEIOCompute
+        - sw_image: DDEIOImage
+        - virtual_storage: DDEIODataVolume
+        - virtual_storage: DDEIOLogVolume
+
+    DDEIOCompute:
+      type: tosca.nodes.nfv.VirtualCompute
+      properties:
+        virtual_memory:
+            virtual_mem_size: 1024 MB
+        virtual_cpu:
+            cpu_architecture: x86
+            num_virtual_cpu: 2
+            virtual_cpu_clock: 1800 MHz
+
+    DDEIOImage:
+      type: tosca.nodes.nfv.SwImage
+      properties:
+        name: DDEIO image
+        version: 1.0
+        checksum: 687251fdf233b0d5319307f21162075d
+        container_format: qcow2
+        disk_format: bare
+        min_disk: 50 GB
+        min_ram: 1024 MB
+        size: 3 GB
+        sw_image: fake_image
+        operating_system: Linux
+        supported_virtualisation_environments:
+          - KVM
+
+    DDEIODataVolume:
+      type: tosca.nodes.nfv.VirtualStorage
+      properties:
+        type_of_storage: volume
+        size_of_storage: 10 GB
+    DDEIOLogVolume:
+      type: tosca.nodes.nfv.VirtualStorage
+      properties:
+        type_of_storage: volume
+        size_of_storage: 10 GB
+    DDEIO_1_external_IPv6_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv6
+        role: leaf
+        description: External connection point on IPV6
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_2_external_IPv6_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv6
+        role: leaf
+        description: External connection point on IPV6
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_3_external_IPv6_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv6
+        role: leaf
+        description: External connection point on IPV6
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_4_external_IPv6_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv6
+        role: leaf
+        description: External connection point on IPV6
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_5_external_IPv6_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv6
+        role: leaf
+        description: External connection point on IPV6
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_6_external_IPv6_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv6
+        role: leaf
+        description: External connection point on IPV6
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_7_external_IPv6_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv6
+        role: leaf
+        description: External connection point on IPV6
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_8_external_IPv6_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv6
+        role: leaf
+        description: External connection point on IPV6
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_9_external_IPv6_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv6
+        role: leaf
+        description: External connection point on IPV6
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_10_external_IPv6_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv6
+        role: leaf
+        description: External connection point on IPV6
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_11_external_IPv6_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv6
+        role: leaf
+        description: External connection point on IPV6
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_12_external_IPv6_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv6
+        role: leaf
+        description: External connection point on IPV6
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_13_external_IPv6_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv6
+        role: leaf
+        description: External connection point on IPV6
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_14_external_IPv6_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv6
+        role: leaf
+        description: External connection point on IPV6
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_15_external_IPv6_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv6
+        role: leaf
+        description: External connection point on IPV6
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_16_external_IPv6_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv6
+        role: leaf
+        description: External connection point on IPV6
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_17_external_IPv6_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv6
+        role: leaf
+        description: External connection point on IPV6
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_18_external_IPv6_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv6
+        role: leaf
+        description: External connection point on IPV6
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_19_external_IPv6_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv6
+        role: leaf
+        description: External connection point on IPV6
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_20_external_IPv6_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv6
+        role: leaf
+        description: External connection point on IPV6
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_1_external_IPv4_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv4
+        role: leaf
+        description: External connection point on IPV4
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_2_external_IPv4_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv4
+        role: leaf
+        description: External connection point on IPV4
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_3_external_IPv4_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv4
+        role: leaf
+        description: External connection point on IPV4
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_4_external_IPv4_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv4
+        role: leaf
+        description: External connection point on IPV4
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_5_external_IPv4_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv4
+        role: leaf
+        description: External connection point on IPV4
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_6_external_IPv4_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv4
+        role: leaf
+        description: External connection point on IPV4
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_7_external_IPv4_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv4
+        role: leaf
+        description: External connection point on IPV4
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_8_external_IPv4_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv4
+        role: leaf
+        description: External connection point on IPV4
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_9_external_IPv4_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv4
+        role: leaf
+        description: External connection point on IPV4
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_10_external_IPv4_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv4
+        role: leaf
+        description: External connection point on IPV4
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_11_external_IPv4_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv4
+        role: leaf
+        description: External connection point on IPV4
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_12_external_IPv4_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv4
+        role: leaf
+        description: External connection point on IPV4
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_13_external_IPv4_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv4
+        role: leaf
+        description: External connection point on IPV4
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_14_external_IPv4_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv4
+        role: leaf
+        description: External connection point on IPV4
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_15_external_IPv4_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv4
+        role: leaf
+        description: External connection point on IPV4
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_16_external_IPv4_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv4
+        role: leaf
+        description: External connection point on IPV4
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_17_external_IPv4_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv4
+        role: leaf
+        description: External connection point on IPV4
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_18_external_IPv4_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv4
+        role: leaf
+        description: External connection point on IPV4
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_19_external_IPv4_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv4
+        role: leaf
+        description: External connection point on IPV4
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_20_external_IPv4_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv4
+        role: leaf
+        description: External connection point on IPV4
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_0_internal_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv4
+        role: leaf
+        description: Internal connection point on IPV4
+      requirements:
+        - virtual_binding: DDEIO
+        - virtual_link: VL_internal
+ 
+    DDEIO_1_external_IPv6_moving_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv6
+        role: leaf
+        description: Moving External connection point on IPV6
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_2_external_IPv6_moving_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv6
+        role: leaf
+        description: Moving External connection point on IPV6
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_3_external_IPv6_moving_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv6
+        role: leaf
+        description: Moving External connection point on IPV6
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_4_external_IPv6_moving_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv6
+        role: leaf
+        description: Moving External connection point on IPV6
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_5_external_IPv6_moving_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv6
+        role: leaf
+        description: Moving External connection point on IPV6
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_6_external_IPv6_moving_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv6
+        role: leaf
+        description: Moving External connection point on IPV6
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_7_external_IPv6_moving_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv6
+        role: leaf
+        description: Moving External connection point on IPV6
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_8_external_IPv6_moving_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv6
+        role: leaf
+        description: Moving External connection point on IPV6
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_9_external_IPv6_moving_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv6
+        role: leaf
+        description: Moving External connection point on IPV6
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_10_external_IPv6_moving_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv6
+        role: leaf
+        description: Moving External connection point on IPV6
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_11_external_IPv6_moving_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv6
+        role: leaf
+        description: Moving External connection point on IPV6
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_12_external_IPv6_moving_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv6
+        role: leaf
+        description: Moving External connection point on IPV6
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_13_external_IPv6_moving_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv6
+        role: leaf
+        description: Moving External connection point on IPV6
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_14_external_IPv6_moving_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv6
+        role: leaf
+        description: Moving External connection point on IPV6
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_15_external_IPv6_moving_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv6
+        role: leaf
+        description: Moving External connection point on IPV6
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_16_external_IPv6_moving_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv6
+        role: leaf
+        description: Moving External connection point on IPV6
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_17_external_IPv6_moving_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv6
+        role: leaf
+        description: Moving External connection point on IPV6
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_18_external_IPv6_moving_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv6
+        role: leaf
+        description: Moving External connection point on IPV6
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_19_external_IPv6_moving_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv6
+        role: leaf
+        description: Moving External connection point on IPV6
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_20_external_IPv6_moving_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv6
+        role: leaf
+        description: Moving External connection point on IPV6
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_1_external_IPv4_moving_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv4
+        role: leaf
+        description: Moving External connection point on IPV4
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_2_external_IPv4_moving_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv4
+        role: leaf
+        description: Moving External connection point on IPV4
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_3_external_IPv4_moving_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv4
+        role: leaf
+        description: Moving External connection point on IPV4
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_4_external_IPv4_moving_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv4
+        role: leaf
+        description: Moving External connection point on IPV4
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_5_external_IPv4_moving_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv4
+        role: leaf
+        description: Moving External connection point on IPV4
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_6_external_IPv4_moving_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv4
+        role: leaf
+        description: Moving External connection point on IPV4
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_7_external_IPv4_moving_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv4
+        role: leaf
+        description: Moving External connection point on IPV4
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_8_external_IPv4_moving_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv4
+        role: leaf
+        description: Moving External connection point on IPV4
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_9_external_IPv4_moving_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv4
+        role: leaf
+        description: Moving External connection point on IPV4
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_10_external_IPv4_moving_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv4
+        role: leaf
+        description: Moving External connection point on IPV4
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_11_external_IPv4_moving_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv4
+        role: leaf
+        description: Moving External connection point on IPV4
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_12_external_IPv4_moving_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv4
+        role: leaf
+        description: Moving External connection point on IPV4
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_13_external_IPv4_moving_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv4
+        role: leaf
+        description: Moving External connection point on IPV4
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_14_external_IPv4_moving_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv4
+        role: leaf
+        description: Moving External connection point on IPV4
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_15_external_IPv4_moving_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv4
+        role: leaf
+        description: Moving External connection point on IPV4
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_16_external_IPv4_moving_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv4
+        role: leaf
+        description: Moving External connection point on IPV4
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_17_external_IPv4_moving_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv4
+        role: leaf
+        description: Moving External connection point on IPV4
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_18_external_IPv4_moving_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv4
+        role: leaf
+        description: Moving External connection point on IPV4
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_19_external_IPv4_moving_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv4
+        role: leaf
+        description: Moving External connection point on IPV4
+      requirements:
+        - virtual_binding: DDEIO
+    DDEIO_20_external_IPv4_moving_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv4
+        role: leaf
+        description: Moving External connection point on IPV4
+      requirements:
+        - virtual_binding: DDEIO
+    external_IPv6_DDEIO_1_ECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - internal_connection_point: DDEIO_1_external_IPv6_CP
+    external_IPv6_DDEIO_2_ECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - internal_connection_point: DDEIO_2_external_IPv6_CP
+    external_IPv6_DDEIO_3_ECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - internal_connection_point: DDEIO_3_external_IPv6_CP
+    external_IPv6_DDEIO_4_ECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - internal_connection_point: DDEIO_4_external_IPv6_CP
+    external_IPv6_DDEIO_5_ECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - internal_connection_point: DDEIO_5_external_IPv6_CP
+    external_IPv6_DDEIO_6_ECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - internal_connection_point: DDEIO_6_external_IPv6_CP
+    external_IPv6_DDEIO_7_ECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - internal_connection_point: DDEIO_7_external_IPv6_CP
+    external_IPv6_DDEIO_8_ECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - internal_connection_point: DDEIO_8_external_IPv6_CP
+    external_IPv6_DDEIO_9_ECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - internal_connection_point: DDEIO_9_external_IPv6_CP
+    external_IPv6_DDEIO_10_ECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - internal_connection_point: DDEIO_10_external_IPv6_CP
+    external_IPv6_DDEIO_11_ECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - internal_connection_point: DDEIO_11_external_IPv6_CP
+    external_IPv6_DDEIO_12_ECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - internal_connection_point: DDEIO_12_external_IPv6_CP
+    external_IPv6_DDEIO_13_ECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - internal_connection_point: DDEIO_13_external_IPv6_CP
+    external_IPv6_DDEIO_14_ECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - internal_connection_point: DDEIO_14_external_IPv6_CP
+    external_IPv6_DDEIO_15_ECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - internal_connection_point: DDEIO_15_external_IPv6_CP
+    external_IPv6_DDEIO_16_ECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - internal_connection_point: DDEIO_16_external_IPv6_CP
+    external_IPv6_DDEIO_17_ECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - internal_connection_point: DDEIO_17_external_IPv6_CP
+    external_IPv6_DDEIO_18_ECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - internal_connection_point: DDEIO_18_external_IPv6_CP
+    external_IPv6_DDEIO_19_ECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - internal_connection_point: DDEIO_19_external_IPv6_CP
+    external_IPv6_DDEIO_20_ECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - internal_connection_point: DDEIO_20_external_IPv6_CP
+    external_IPv4_DDEIO_1_ECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv4
+      requirements:
+        - internal_connection_point: DDEIO_1_external_IPv4_CP
+    external_IPv4_DDEIO_2_ECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv4
+      requirements:
+        - internal_connection_point: DDEIO_2_external_IPv4_CP
+    external_IPv4_DDEIO_3_ECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv4
+      requirements:
+        - internal_connection_point: DDEIO_3_external_IPv4_CP
+    external_IPv4_DDEIO_4_ECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv4
+      requirements:
+        - internal_connection_point: DDEIO_4_external_IPv4_CP
+    external_IPv4_DDEIO_5_ECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv4
+      requirements:
+        - internal_connection_point: DDEIO_5_external_IPv4_CP
+    external_IPv4_DDEIO_6_ECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv4
+      requirements:
+        - internal_connection_point: DDEIO_6_external_IPv4_CP
+    external_IPv4_DDEIO_7_ECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv4
+      requirements:
+        - internal_connection_point: DDEIO_7_external_IPv4_CP
+    external_IPv4_DDEIO_8_ECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv4
+      requirements:
+        - internal_connection_point: DDEIO_8_external_IPv4_CP
+    external_IPv4_DDEIO_9_ECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv4
+      requirements:
+        - internal_connection_point: DDEIO_9_external_IPv4_CP
+    external_IPv4_DDEIO_10_ECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv4
+      requirements:
+        - internal_connection_point: DDEIO_10_external_IPv4_CP
+    external_IPv4_DDEIO_11_ECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv4
+      requirements:
+        - internal_connection_point: DDEIO_11_external_IPv4_CP
+    external_IPv4_DDEIO_12_ECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv4
+      requirements:
+        - internal_connection_point: DDEIO_12_external_IPv4_CP
+    external_IPv4_DDEIO_13_ECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv4
+      requirements:
+        - internal_connection_point: DDEIO_13_external_IPv4_CP
+    external_IPv4_DDEIO_14_ECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv4
+      requirements:
+        - internal_connection_point: DDEIO_14_external_IPv4_CP
+    external_IPv4_DDEIO_15_ECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv4
+      requirements:
+        - internal_connection_point: DDEIO_15_external_IPv4_CP
+    external_IPv4_DDEIO_16_ECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv4
+      requirements:
+        - internal_connection_point: DDEIO_16_external_IPv4_CP
+    external_IPv4_DDEIO_17_ECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv4
+      requirements:
+        - internal_connection_point: DDEIO_17_external_IPv4_CP
+    external_IPv4_DDEIO_18_ECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv4
+      requirements:
+        - internal_connection_point: DDEIO_18_external_IPv4_CP
+    external_IPv4_DDEIO_19_ECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv4
+      requirements:
+        - internal_connection_point: DDEIO_19_external_IPv4_CP
+    external_IPv4_DDEIO_20_ECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv4
+      requirements:
+        - internal_connection_point: DDEIO_20_external_IPv4_CP
+ 
+    external_IPv6_DDEIO_1_MovingECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - internal_connection_point: DDEIO_1_external_IPv6_moving_CP
+    external_IPv6_DDEIO_2_MovingECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - internal_connection_point: DDEIO_2_external_IPv6_moving_CP
+    external_IPv6_DDEIO_3_MovingECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - internal_connection_point: DDEIO_3_external_IPv6_moving_CP
+    external_IPv6_DDEIO_4_MovingECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - internal_connection_point: DDEIO_4_external_IPv6_moving_CP
+    external_IPv6_DDEIO_5_MovingECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - internal_connection_point: DDEIO_5_external_IPv6_moving_CP
+    external_IPv6_DDEIO_6_MovingECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - internal_connection_point: DDEIO_6_external_IPv6_moving_CP
+    external_IPv6_DDEIO_7_MovingECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - internal_connection_point: DDEIO_7_external_IPv6_moving_CP
+    external_IPv6_DDEIO_8_MovingECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - internal_connection_point: DDEIO_8_external_IPv6_moving_CP
+    external_IPv6_DDEIO_9_MovingECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - internal_connection_point: DDEIO_9_external_IPv6_moving_CP
+    external_IPv6_DDEIO_10_MovingECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - internal_connection_point: DDEIO_10_external_IPv6_moving_CP
+    external_IPv6_DDEIO_11_MovingECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - internal_connection_point: DDEIO_11_external_IPv6_moving_CP
+    external_IPv6_DDEIO_12_MovingECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - internal_connection_point: DDEIO_12_external_IPv6_moving_CP
+    external_IPv6_DDEIO_13_MovingECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - internal_connection_point: DDEIO_13_external_IPv6_moving_CP
+    external_IPv6_DDEIO_14_MovingECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - internal_connection_point: DDEIO_14_external_IPv6_moving_CP
+    external_IPv6_DDEIO_15_MovingECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - internal_connection_point: DDEIO_15_external_IPv6_moving_CP
+    external_IPv6_DDEIO_16_MovingECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - internal_connection_point: DDEIO_16_external_IPv6_moving_CP
+    external_IPv6_DDEIO_17_MovingECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - internal_connection_point: DDEIO_17_external_IPv6_moving_CP
+    external_IPv6_DDEIO_18_MovingECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - internal_connection_point: DDEIO_18_external_IPv6_moving_CP
+    external_IPv6_DDEIO_19_MovingECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - internal_connection_point: DDEIO_19_external_IPv6_moving_CP
+    external_IPv6_DDEIO_20_MovingECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - internal_connection_point: DDEIO_20_external_IPv6_moving_CP
+    external_IPv4_DDEIO_1_MovingECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv4
+      requirements:
+        - internal_connection_point: DDEIO_1_external_IPv4_moving_CP
+    external_IPv4_DDEIO_2_MovingECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv4
+      requirements:
+        - internal_connection_point: DDEIO_2_external_IPv4_moving_CP
+    external_IPv4_DDEIO_3_MovingECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv4
+      requirements:
+        - internal_connection_point: DDEIO_3_external_IPv4_moving_CP
+    external_IPv4_DDEIO_4_MovingECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv4
+      requirements:
+        - internal_connection_point: DDEIO_4_external_IPv4_moving_CP
+    external_IPv4_DDEIO_5_MovingECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv4
+      requirements:
+        - internal_connection_point: DDEIO_5_external_IPv4_moving_CP
+    external_IPv4_DDEIO_6_MovingECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv4
+      requirements:
+        - internal_connection_point: DDEIO_6_external_IPv4_moving_CP
+    external_IPv4_DDEIO_7_MovingECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv4
+      requirements:
+        - internal_connection_point: DDEIO_7_external_IPv4_moving_CP
+    external_IPv4_DDEIO_8_MovingECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv4
+      requirements:
+        - internal_connection_point: DDEIO_8_external_IPv4_moving_CP
+    external_IPv4_DDEIO_9_MovingECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv4
+      requirements:
+        - internal_connection_point: DDEIO_9_external_IPv4_moving_CP
+    external_IPv4_DDEIO_10_MovingECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv4
+      requirements:
+        - internal_connection_point: DDEIO_10_external_IPv4_moving_CP
+    external_IPv4_DDEIO_11_MovingECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv4
+      requirements:
+        - internal_connection_point: DDEIO_11_external_IPv4_moving_CP
+    external_IPv4_DDEIO_12_MovingECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv4
+      requirements:
+        - internal_connection_point: DDEIO_12_external_IPv4_moving_CP
+    external_IPv4_DDEIO_13_MovingECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv4
+      requirements:
+        - internal_connection_point: DDEIO_13_external_IPv4_moving_CP
+    external_IPv4_DDEIO_14_MovingECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv4
+      requirements:
+        - internal_connection_point: DDEIO_14_external_IPv4_moving_CP
+    external_IPv4_DDEIO_15_MovingECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv4
+      requirements:
+        - internal_connection_point: DDEIO_15_external_IPv4_moving_CP
+    external_IPv4_DDEIO_16_MovingECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv4
+      requirements:
+        - internal_connection_point: DDEIO_16_external_IPv4_moving_CP
+    external_IPv4_DDEIO_17_MovingECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv4
+      requirements:
+        - internal_connection_point: DDEIO_17_external_IPv4_moving_CP
+    external_IPv4_DDEIO_18_MovingECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv4
+      requirements:
+        - internal_connection_point: DDEIO_18_external_IPv4_moving_CP
+    external_IPv4_DDEIO_19_MovingECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv4
+      requirements:
+        - internal_connection_point: DDEIO_19_external_IPv4_moving_CP
+    external_IPv4_DDEIO_20_MovingECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv4
+      requirements:
+        - internal_connection_point: DDEIO_20_external_IPv4_moving_CP
+
+    DDEAPP:
+      type: tosca.nodes.nfv.VDU
+      properties:
+        description: DDEAPP template
+        configurable_properties:
+          additional_vnfc_configurable_properties: {}
+      requirements:
+        - virtual_compute: DDEAPPCompute
+        - sw_image: DDEAPPImage
+        - virtual_storage: DDEAPPDataVolume
+        - virtual_storage: DDEAPPLogVolume
+
+    DDEAPPCompute:
+      type: tosca.nodes.nfv.VirtualCompute
+      properties:
+        virtual_memory:
+            virtual_mem_size: 1024 MB
+        virtual_cpu:
+            cpu_architecture: x86
+            num_virtual_cpu: 2
+            virtual_cpu_clock: 1800 MHz
+
+    DDEAPPImage:
+      type: tosca.nodes.nfv.SwImage
+      properties:
+        name: DDEAPP image
+        version: 1.0
+        checksum: 687251fdf233b0d5319307f21162075d
+        container_format: qcow2
+        disk_format: bare
+        min_disk: 50 GB
+        min_ram: 1024 MB
+        size: 3 GB
+        sw_image: fake_image
+        operating_system: Linux
+        supported_virtualisation_environments:
+          - KVM
+
+    DDEAPPDataVolume:
+      type: tosca.nodes.nfv.VirtualStorage
+      properties:
+        type_of_storage: volume
+        size_of_storage: 10 GB
+    DDEAPPLogVolume:
+      type: tosca.nodes.nfv.VirtualStorage
+      properties:
+        type_of_storage: volume
+        size_of_storage: 5 GB
+    DDEAPP_0_internal_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv4
+        role: leaf
+        description: Internal connection point on IPV4
+      requirements:
+        - virtual_binding: DDEAPP
+        - virtual_link: VL_internal
+
+    OAM:
+      type: tosca.nodes.nfv.VDU
+      properties:
+        description: OAM template
+        configurable_properties:
+          additional_vnfc_configurable_properties: {}
+      requirements:
+        - virtual_compute: OAMCompute
+        - sw_image: OAMImage
+        - virtual_storage: OAMDataVolume
+        - virtual_storage: OAMBRVolume
+        - virtual_storage: OAMLogVolume
+        - virtual_storage: OAMPromVolume
+
+    OAMCompute:
+      type: tosca.nodes.nfv.VirtualCompute
+      properties:
+        virtual_memory:
+            virtual_mem_size: 1024 MB
+        virtual_cpu:
+            cpu_architecture: x86
+            num_virtual_cpu: 2
+            virtual_cpu_clock: 1800 MHz
+
+    OAMImage:
+      type: tosca.nodes.nfv.SwImage
+      properties:
+        name: OAM image
+        version: 1.0
+        checksum: 687251fdf233b0d5319307f21162075d
+        container_format: qcow2
+        disk_format: bare
+        min_disk: 50 GB
+        min_ram: 1024 MB
+        size: 3 GB
+        sw_image: fake_image
+        operating_system: Linux
+        supported_virtualisation_environments:
+          - KVM
+
+    OAMDataVolume:
+      type: tosca.nodes.nfv.VirtualStorage
+      properties:
+        type_of_storage: volume
+        size_of_storage: 10 GB
+
+    OAMLogVolume:
+      type: tosca.nodes.nfv.VirtualStorage
+      properties:
+        type_of_storage: volume
+        size_of_storage: 5 GB
+
+    OAMBRVolume:
+      type: tosca.nodes.nfv.VirtualStorage
+      properties:
+        type_of_storage: volume
+        size_of_storage: 20 GB
+        
+    OAMPromVolume:
+      type: tosca.nodes.nfv.VirtualStorage
+      properties:
+        type_of_storage: volume
+        size_of_storage: 20 GB
+
+    OAM_1_external_IPv6_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv6
+        role: leaf
+        description: External connection point on IPV6
+      requirements:
+        - virtual_binding: OAM
+    OAM_1_external_IPv4_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv4
+        role: leaf
+        description: External connection point on IPV4
+      requirements:
+        - virtual_binding: OAM
+    OAM_2BKP_external_IPv6_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv6
+        role: leaf
+        description: External connection point on IPV6
+      requirements:
+        - virtual_binding: OAM
+        
+    OAM_0_internal_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv4
+        role: leaf
+        description: Internal connection point on IPV4
+      requirements:
+        - virtual_binding: OAM
+        - virtual_link: VL_internal
+
+    OAM_1_external_IPv6_moving_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv6
+        role: leaf
+        description: Moving External connection point on IPV6
+      requirements:
+        - virtual_binding: OAM
+        
+    OAM_2BKP_external_IPv6_moving_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv6
+        role: leaf
+        description: Moving External connection point on IPV6
+      requirements:
+        - virtual_binding: OAM
+
+    OAM_1_external_IPv4_moving_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv4
+        role: leaf
+        description: Moving External connection point on IPV4
+      requirements:
+        - virtual_binding: OAM
+
+    external_IPv6_OAM_1_ECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - internal_connection_point: OAM_1_external_IPv6_CP
+        
+    external_IPv6_OAM_2BKP_ECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - internal_connection_point: OAM_2BKP_external_IPv6_CP
+
+    external_IPv4_OAM_1_ECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv4
+      requirements:
+        - internal_connection_point: OAM_1_external_IPv4_CP
+ 
+    external_IPv6_OAM_1_MovingECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - internal_connection_point: OAM_1_external_IPv6_moving_CP
+
+    external_IPv4_OAM_1_MovingECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv4
+      requirements:
+        - internal_connection_point: OAM_1_external_IPv4_moving_CP
+        
+    external_IPv6_OAM_2BKP_MovingECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - internal_connection_point: OAM_2BKP_external_IPv6_moving_CP
+        
+    DB:
+      type: tosca.nodes.nfv.VDU
+      properties:
+        description: DB template
+        configurable_properties:
+          additional_vnfc_configurable_properties: {}
+      requirements:
+        - virtual_compute: DBCompute
+        - sw_image: DBImage
+        - virtual_storage: DBDataVolume
+        - virtual_storage: DBLogVolume
+        - virtual_storage: DBDatastoreVolume
+
+    DBCompute:
+      type: tosca.nodes.nfv.VirtualCompute
+      properties:
+        virtual_memory:
+            virtual_mem_size: 1024 MB
+        virtual_cpu:
+            cpu_architecture: x86
+            num_virtual_cpu: 2
+            virtual_cpu_clock: 1800 MHz
+
+    DBImage:
+      type: tosca.nodes.nfv.SwImage
+      properties:
+        name: DB image
+        version: 1.0
+        checksum: 687251fdf233b0d5319307f21162075d
+        container_format: qcow2
+        disk_format: bare
+        min_disk: 50 GB
+        min_ram: 1024 MB
+        size: 3 GB
+        sw_image: fake_image
+        operating_system: Linux
+        supported_virtualisation_environments:
+          - KVM
+          
+    DBDataVolume:
+      type: tosca.nodes.nfv.VirtualStorage
+      properties:
+        type_of_storage: volume
+        size_of_storage: 10 GB
+
+    DBLogVolume:
+      type: tosca.nodes.nfv.VirtualStorage
+      properties:
+        type_of_storage: volume
+        size_of_storage: 1 GB
+
+    DBDatastoreVolume:
+      type: tosca.nodes.nfv.VirtualStorage
+      properties:
+        type_of_storage: volume
+        size_of_storage: 10 GB
+    DB_0_internal_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv4
+        role: leaf
+        description: Internal connection point on IPV4
+      requirements:
+        - virtual_binding: DB
+        - virtual_link: VL_internal
+
+    DB_external_CP:
+      type: tosca.nodes.nfv.ICP
+      properties:
+        layer_protocol: ipv6
+        role: leaf
+        description: DB external connection point on IPv6
+      requirements:
+        - virtual_binding: DB
+
+    externalDB_IPv6_ECP:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv6
+      requirements:
+        - internal_connection_point: DB_external_CP
+
+    VL_internal:
+      type: tosca.nodes.nfv.VL
+      properties:
+        connectivity_type:
+          layer_protocol: ipv4
+          flow_pattern: mesh
+        test_access: []
+        description: ..
+        vl_flavours: {}
+
+
+  groups:
+    DDEIOScalingGroup:
+      type: tosca.groups.nfv.ElementGroup
+      description: ..
+      members: [ DDEIO ]
+    DDEAPPScalingGroup:
+      type: tosca.groups.nfv.ElementGroup
+      description: ..
+      members: [ DDEAPP ]
+    OAMScalingGroup:
+      type: tosca.groups.nfv.ElementGroup
+      description: ..
+      members: [ OAM ]
+    DBScalingGroup:
+      type: tosca.groups.nfv.ElementGroup
+      description: ..
+      members: [ DB ]
+
+  policies:

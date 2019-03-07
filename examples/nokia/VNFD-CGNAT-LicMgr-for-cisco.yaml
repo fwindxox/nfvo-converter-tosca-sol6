@@ -1,0 +1,103 @@
+tosca_definitions_version: tosca_simple_profile_for_nfv_1_0_0_nokia_3_4_0
+
+topology_template:
+    substitution_mappings:
+        node_type: tosca.nodes.nfv.VNF
+        properties:
+            descriptor_id: 'F5~BIG-IQ-HA-LicMgr~1.0'
+            descriptor_version: '1.0'
+            software_version: '6.1'
+            provider: F5 Networks
+            product_name: F5 BIG-IQ
+            product_info_name: F5 BIG-IQ HA
+            product_info_description: F5 BIG-IQ License Mgr VNF with HA
+            vnfm_info:
+                - CBAM
+        requirements:
+            - virtual_link: [ mgmt_ecp, external_virtual_link ]
+        capabilities:
+            deployment_flavour:
+                properties:
+                    flavour_id: default
+                    description: Default Deployment Flavor
+                    instantiation_levels:
+                        default:
+                            description: Default level
+                            vdu_levels:
+                                bigiq_server:
+                                    number_of_instances: 2
+                    default_instantiation_level_id: default
+                    vdu_profile:
+                        bigiq_server:
+                            min_number_of_instances: 2
+                            max_number_of_instances: 2
+
+            vnf:
+              properties:
+                modifiable_attributes:
+                  extensions:
+                    vnf_name:
+                      default: "UHN3tld1fb01"
+                    bigiq_server_1_name:
+                      default: "UHN3tld1fbbq0000"
+                    bigiq_server_2_name:
+                      default: "UHN3tld1fbbq0001"
+
+
+        interfaces:
+            Basic:
+                instantiate:
+                terminate:
+
+    node_templates:
+        bigiq_server:
+            type: tosca.nodes.nfv.VDU
+            properties:
+                description: ...
+            requirements:
+                - virtual_compute: bigiq_compute
+                - sw_image: bigiq_image
+
+        bigiq_compute:
+            type: tosca.nodes.nfv.VirtualCompute
+            properties:
+                virtual_memory:
+                    virtual_mem_size: 4 GB
+                virtual_cpu:
+                    cpu_architecture: x86
+                    num_virtual_cpu: 2
+                    virtual_cpu_clock: 1800 MHz
+
+        bigiq_image:
+            type: tosca.nodes.nfv.SwImage
+            properties:
+                name: F5 BIG-IQ Image
+                version: 1.0
+                sw_image: BIG-IQ-5.3.0.0.0.1119
+                checksum: f3aa2d51d82fa3f5a4fa10005a378e16
+                container_format: BARE
+                disk_format: QCOW2
+                min_disk: 0 GB
+                operating_system: Linux
+                size: 3 GB
+     
+        mgmt_icp:
+            type: tosca.nodes.nfv.ICP
+            properties:
+                layer_protocol: ipv6
+            requirements:
+                - virtual_binding: bigiq_server
+
+        mgmt_ecp:
+            type: tosca.nodes.nfv.ECP
+            properties:
+                layer_protocol: ipv6
+            requirements:
+                - internal_connection_point: mgmt_icp
+      
+    policies:
+        - bigiq_anti_affinity:
+            type: tosca.policies.nfv.LocalAntiAffinity
+            targets: [ bigiq_server ]
+            properties:
+                scope: nfvi_node
