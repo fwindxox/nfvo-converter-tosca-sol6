@@ -1,0 +1,375 @@
+tosca_definitions_version: tosca_simple_yaml_1_2
+description: VNFD for Altiostar vDU, single VDU
+
+imports:
+  - cisco_nfv_sol001_types.yaml
+  - etsi_nfv_sol001_vnfd_0_10_0_types.yaml
+
+metadata:
+  template_name: altiostar_vDU
+  template_author: Cisco Systems
+  template_version: '1.0'
+
+dsl_definitions:
+  descriptor_id: &descriptor_id altiostar_vDU
+  provider: &provider Cisco
+  product_name: &product_name altiostar_vDU
+  software_version: &software_version '1.0'
+  descriptor_version: &descriptor_version '1.1'
+  flavour_id: &flavour_id default
+  flavour_description: &flavour_description 'Default VNF Deployment Flavour'
+  vnfm: &vnfm 'Cisco ESC'
+
+node_types:
+  cisco.1VDU.1_0.1_0:
+    derived_from: tosca.nodes.nfv.VNF
+    properties:
+      descriptor_id:
+        type: string
+        constraints: [ valid_values: [ *descriptor_id ] ]
+        default: *descriptor_id
+      provider:
+        type: string
+        constraints: [ valid_values: [ *provider ] ]
+        default: *provider
+      product_name:
+        type: string
+        constraints: [ valid_values: [ *product_name ] ]
+        default: *product_name
+      software_version:
+        type: string
+        constraints: [ valid_values: [ *software_version ] ]
+        default: *software_version
+      descriptor_version:
+        type: string
+        constraints: [ valid_values: [ *descriptor_version ] ]
+        default: *descriptor_version
+      flavour_id:
+        type: string
+        constraints: [ valid_values: [ *flavour_id ] ]
+        default: *flavour_id
+      flavour_description:
+        type: string
+        constraints: [ valid_values: [ *flavour_description ] ]
+        default: *flavour_description
+      vnfm_info:
+        type: list
+        entry_schema:
+          type: string
+        constraints: [ valid_values: [ *vnfm ] ]
+        default: [ *vnfm ]
+      configurable_properties:
+        type: tosca.datatypes.nfv.VnfConfigurableProperties
+        description: Describes the configurable properties of the VNF
+        required: false
+      lcm_operations_configuration:
+        type: cisco.datatypes.nfv.VnfLcmOperationsConfiguration
+    interfaces:
+      Vnflcm:
+        type: cisco.interfaces.nfv.Vnflcm
+    artifacts:
+
+topology_template:
+###################
+# Template Inputs #
+###################
+  inputs:
+
+    BOOTUP_TIME:
+      description: The time to wait before expecting bootup to be complete
+      type: integer
+      #example: 600
+
+    NIC1_IP_ADDRESS:
+      description: The static ip address
+      type: string
+      #example: 192.168.99.99
+
+    VDU_IMAGE_NAME:
+      description: vDU image name
+
+    VIM_FLAVOR:
+      description: Flavour name
+      type: string
+########################
+# Substitution Mapping #
+########################
+  substitution_mappings:
+    node_type: cisco.1VDU.1_0.1_0
+    requirements:
+      - virtual_link: [ node_1_nic0, virtual_link ]
+
+##########
+# Nodes: #
+##########
+  node_templates:
+
+#####################
+# VNF configuration #
+#####################
+    vnf:
+      type: cisco.1VDU.1_0.1_0
+      properties:
+        descriptor_id: altiostar_vDU
+        descriptor_version: '1.1'
+        provider: Cisco
+        product_name: altiostar_vDU
+        software_version: '1.0'
+        product_info_name: altiostar_vDU
+        vnfm_info:
+          - 'Cisco ESC'
+        configurable_properties:
+          is_autoscale_enabled: false
+          is_autoheal_enabled: false
+        lcm_operations_configuration:
+          heal:
+            recovery_action: REBOOT_THEN_REDEPLOY
+            recovery_wait_time: 30
+        flavour_id: default
+        flavour_description: 'Default VNF Deployment Flavour'
+      interfaces:
+        Vnflcm:
+          instantiate:
+            #implementation: { get_artifact: [SELF, PRE_DEPLOY] }
+            inputs:
+              additional_parameters:
+                VIM_FLAVOR: { get_input: VIM_FLAVOR }
+                BOOTUP_TIME: { get_input: BOOTUP_TIME }
+          instantiate_end:
+            #implementation: { get_artifact: [SELF, POST_DEPLOY] }
+          operate:
+          heal:
+      artifacts:
+
+#####################
+# VDU configuration #
+#####################
+    vdu_node_1:
+      type: cisco.nodes.nfv.Vdu.Compute
+      properties:
+        name: 'Altiostar-vDU'
+        description: 'Altiostar-vDU ETSI for SolTest'
+        boot_order:
+          - vDU4_vol
+        configurable_properties:
+          additional_vnfc_configurable_properties:
+            vim_flavor: { get_input: VIM_FLAVOR }
+            bootup_time: { get_input: BOOTUP_TIME }
+        vdu_profile:
+          min_number_of_instances: 1
+          max_number_of_instances: 3
+        kpi_data:
+          VM_ALIVE-1:
+            event_name: 'VM_ALIVE'
+            metric_value: 1
+            metric_cond: 'GT'
+            metric_type: 'UINT32'
+            metric_occurences_true: 1
+            metric_occurences_false: 30
+            metric_collector:
+              metric_type: 'ICMPPing'
+              nicid: 0
+              address_id: 0
+              poll_frequency: 10
+              polling_unit: 'seconds'
+              continuous_alarm: false
+        vendor_section:
+          cisco_esc:
+            config_data:
+              '--user-data':
+                file: ../Files/Scripts/metadata.txt
+        admin_rules:
+          VM_ALIVE:
+            event_name: 'VM_ALIVE'
+            action:
+              - 'ALWAYS log'
+              - 'FALSE recover autohealing'
+              - 'TRUE esc_vm_alive_notification'
+      capabilities:
+        virtual_compute:
+          properties:
+            virtual_cpu:
+              num_virtual_cpu: 1
+            virtual_memory:
+              virtual_mem_size: 512 MB
+      requirements:
+        - virtual_storage: vDU4_vol
+
+
+#########################
+# Virtual Block Storage #
+#########################
+    vDU4_vol:
+      type: cisco.nodes.nfv.Vdu.VirtualBlockStorage
+      properties:
+        virtual_block_storage_data:
+          size_of_storage: 15 GB
+          vdu_storage_requirements:
+            vol_id: '1'
+            bus: virtio
+            boot_index: 0
+            # Current OS does not support LVM type, it needs physical hardware
+            #type: LVM
+        sw_image_data:
+          name: { get_input: VDU_IMAGE_NAME }
+          version: '1.0'
+          checksum: 48d12496504bb188ff7462ef3d52c4b2
+          container_format: bare
+          disk_format: qcow2
+          min_disk: 2 GB
+          size: 2 GB
+      artifacts:
+        sw_image:
+          type: tosca.artifacts.nfv.SwImage
+          file: http://engci-maven-master.cisco.com/artifactory/nso-snapshot/NFVO-SOL003-VNF-Images-0.0.3/Altiostar_VDU/vDU-2.0-402-27Dec2017.qcow2
+
+
+######################################
+# Connection points for "vdu_node_1" #
+######################################
+    node_1_nic0:
+      type: cisco.nodes.nfv.VduCp
+      properties:
+        layer_protocols: [ ipv4 ]
+        protocol:
+          - associated_layer_protocol: ipv4
+        trunk_mode: false
+        order: 0
+        management: true
+        allowed_address_pairs:
+      requirements:
+        - virtual_binding: vdu_node_1
+
+    node_1_nic1:
+      type: cisco.nodes.nfv.VduCp
+      properties:
+        layer_protocols: [ ipv4 ]
+        protocol:
+          - associated_layer_protocol: ipv4
+        trunk_mode: false
+        order: 1
+        management: false
+        ip_address: { get_input: NIC1_IP_ADDRESS }
+        static_ip_address_pool:
+          - { get_input: NIC1_IP_ADDRESS }
+      requirements:
+        - virtual_link: front-haul
+        - virtual_binding: vdu_node_1
+
+    node_1_nic2:
+      type: cisco.nodes.nfv.VduCp
+      properties:
+        layer_protocols: [ ipv4 ]
+        protocol:
+          - associated_layer_protocol: ipv4
+        trunk_mode: false
+        order: 2
+        management: false
+        allowed_address_pairs:
+      requirements:
+        - virtual_link: back-haul
+        - virtual_binding: vdu_node_1
+
+    node_1_nic3:
+      type: cisco.nodes.nfv.VduCp
+      properties:
+        layer_protocols: [ ipv4 ]
+        protocol:
+          - associated_layer_protocol: ipv4
+        trunk_mode: false
+        order: 3
+        management: false
+        allowed_address_pairs:
+      requirements:
+        - virtual_link: altiostar-mgmt
+        - virtual_binding: vdu_node_1
+
+########################################
+# Internal Virtual Links configuration #
+########################################
+    front-haul:
+      type: tosca.nodes.nfv.VnfVirtualLink
+      properties:
+        connectivity_type:
+          layer_protocols: [ ipv4 ]
+        description: Front Haul Network VL
+        vl_profile:
+          max_bitrate_requirements:
+            root: 100000
+          min_bitrate_requirements:
+            root: 0
+
+    back-haul:
+      type: tosca.nodes.nfv.VnfVirtualLink
+      properties:
+        connectivity_type:
+          layer_protocols: [ ipv4 ]
+        description: Back Haul Network VL
+        vl_profile:
+          max_bitrate_requirements:
+            root: 100000
+          min_bitrate_requirements:
+            root: 0
+
+    altiostar-mgmt:
+      type: tosca.nodes.nfv.VnfVirtualLink
+      properties:
+        connectivity_type:
+          layer_protocols: [ ipv4 ]
+        description: Altiostar Management Network VL
+        vl_profile:
+          max_bitrate_requirements:
+            root: 100000
+          min_bitrate_requirements:
+            root: 0
+########################
+# Policy configuration #
+########################
+  policies:
+    - scaling_aspects:
+        type: tosca.policies.nfv.ScalingAspects
+        properties:
+          aspects:
+            default_sa:
+              name: 'default_sa'
+              description: 'Default scaling aspect'
+              max_scale_level: 4
+              step_deltas:
+                - delta_1
+    - instantiation_levels:
+        type: tosca.policies.nfv.InstantiationLevels
+        properties:
+          levels:
+            default:
+              description: 'Default instantiation level'
+              scale_info:
+                default_sa:
+                  scale_level: 0
+          default_level: default
+
+######
+# VM #
+######
+    - vm_initial_delta:
+        type: tosca.policies.nfv.VduInitialDelta
+        properties:
+          initial_delta:
+            number_of_instances: 1
+        targets: [ vdu_node_1 ]
+
+    - vm_instantiation_levels:
+        type: tosca.policies.nfv.VduInstantiationLevels
+        properties:
+          levels:
+            default:
+              number_of_instances: 1
+        targets: [ vdu_node_1 ]
+
+    - vm_scaling_aspect_deltas:
+        type: tosca.policies.nfv.VduScalingAspectDeltas
+        properties:
+          aspect: default_sa
+          deltas:
+            delta_1:
+              number_of_instances: 1
+        targets: [ vdu_node_1 ]

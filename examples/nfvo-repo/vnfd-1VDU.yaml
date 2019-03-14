@@ -1,0 +1,182 @@
+tosca_definitions_version: tosca_simple_profile_for_nfv_1_0_0
+description: VNFD Example, single VDU
+metadata:
+  template_name: vnfd-1VDU
+topology_template:
+  node_templates:
+    vnf:
+      type: tosca.nodes.nfv.VNF.CiscoESC
+      properties:
+        descriptor_id: Automation-Cirros
+        descriptor_version: 1.0
+        provider: Cisco
+        product_name: VPC
+        software_version: 1.0
+        product_info_name: 'Virtual Packet Core (VPC)'
+        vnfm_info:
+          - 'Cisco ESC'
+      requirements:
+        - virtual_link: [ node1_ecp, external_virtual_link ]
+      capabilities:
+        configurableProperties:
+          properties:
+            is_autoheal_enabled: false
+        deployment_flavour:
+          properties:
+            flavour_id: default
+            description: 'Default VNF Deployment Flavour'
+            vdu_profile:
+              vdu_node_1:
+                min_number_of_instances: 1
+                max_number_of_instances: 1
+            instantiation_levels:
+              default:
+                description: 'Default Instantiation Level'
+                vdu_levels:
+                  vdu_node_1:
+                    number_of_instances: 1
+                scale_info:
+                  default_scaling_aspect:
+                    scale_level: 1
+            default_instantiation_level_id: default
+            vnf_lcm_operations_configuration: {}
+#            affinity_or_anti_affinity_groups:
+#              aa_group_1:
+#                type: anti-affinity
+#                scope: 'NFVI-node'
+#              aa_group_2:
+#                type: anti-affinity
+#                scope: 'NFVI-node'
+            scaling_aspect:
+              - default_scaling_aspect
+            cisco_esc_properties:
+            #  policies:
+            #    1:
+            #      conditions:
+            #        - name: 'LCS::PRE_DEPLOY'
+            #      actions:
+            #        - name: 'GEN_VPC_CHASSIS_ID'
+            #          type: 'SCRIPT'
+            #          properties:
+            #            # CHASSIS_KEY: { get_input: CHASSIS_KEY }
+            #            script_filename: /opt/cisco/esc/esc-scripts/esc_vpc_chassis_id.py
+            #        - name: 'GEN_VPC_SSH_KEYS'
+            #          type: 'SCRIPT'
+            #          properties:
+            #            script_filename: /opt/cisco/esc/esc-scripts/esc-vpc-di-internal-keys.sh
+    vdu_node_1:
+      type: tosca.nodes.nfv.VDU.Compute.CiscoESC
+      capabilities:
+        virtual_compute:
+          properties:
+            virtual_cpu:
+              num_virtual_cpu: 1
+            virtual_memory:
+              virtual_mem_size: 512 MB
+      requirements:
+        # Additional storage volumes
+        # - virtual_storage: cirros-0.3.5-x86_64-disk
+      properties:
+        additional_vnfc_configurable_properties: {}
+        cisco_esc_properties:
+          vim_flavour: Automation-Cirros-Flavor
+
+      artifacts:
+        - sw_image:
+            name: Automation-Cirros-Image
+            version: "1.0"
+            checksum: 9af30fce37a4c5c831e095745744d6d2
+            container_format: qcow2
+            disk_format: bare
+            min_disk: 2 GB
+            size: 2 GB
+            sw_image: http://10.85.103.34/share/images/kilo_images/Automation-Cirros-Image.qcow2
+
+    # Additional storage volumes
+    #cirros-0.3.5-x86_64-disk:
+    #  type: tosca.nodes.nfv.VDU.VirtualStorage.CiscoESC
+    #  properties:
+    #    type_of_storage: volume
+    #    size_of_storage: 1 GB
+    #    cisco_esc_properties:
+    #      vol_id: 1
+    #      bus: virtio
+    #      boot_index: 0
+    #      type: lvm
+    #  artifacts:
+    #    - sw_image:
+    #        name: Automation-Cirros-Image
+    #        version: '1.0'
+    #        checksum: 9af30fce37a4c5c831e095745744d6d2
+    #        container_format: qcow2
+    #        disk_format: bare
+    #        min_disk: 2 GB
+    #        size: 2 GB
+    #        sw_image: http://10.85.103.34/share/images/kilo_images/Automation-Cirros-Image.qcow2
+
+    node_1_nic0:
+      type: tosca.nodes.nfv.Cpd.CiscoESC
+      properties:
+        layer_protocol: ipv4
+        cisco_esc_properties:
+          management: true
+          nicid: 0
+          network: private
+      requirements:
+        - virtual_binding: vdu_node_1
+
+    node_1_nic1:
+      type: tosca.nodes.nfv.Cpd.CiscoESC
+      properties:
+        layer_protocol: ipv4
+        cisco_esc_properties:
+          nicid: 1
+      requirements:
+        - virtual_link: v4-private1
+        - virtual_binding: vdu_node_1
+
+
+    private:
+      type: tosca.nodes.nfv.VnfVirtualLinkDesc
+      properties:
+        connectivity_type:
+          layer_protocol: ipv4
+
+        vl_flavours: {}
+        test_access: []
+        description: Management Network VL
+
+    v4-private1:
+      type: tosca.nodes.nfv.VnfVirtualLinkDesc
+      properties:
+        connectivity_type:
+          layer_protocol: ipv4
+        vl_flavours: {}
+        test_access: []
+        description: 1VDU Internal Network VL
+
+    default_scaling_aspect:
+      type: tosca.nodes.nfv.ScalingAspect
+      name: Default
+      description: Default
+      associated_group: default_vdu_nodes_group
+      max_scale_level: 2
+
+#######################
+# VNFD Element Groups #
+#######################
+
+    vnfd_element_groups:
+      default_vdu_nodes_group:
+        description: Control Function Elements
+        vdus: [vdu_node_1]
+
+##############################
+# External Connection Points #
+##############################
+    node1_ecp:
+      type: tosca.nodes.nfv.ECP
+      properties:
+        layer_protocol: ipv4
+      requirements:
+        - internal_connection_point: node_1_nic0
