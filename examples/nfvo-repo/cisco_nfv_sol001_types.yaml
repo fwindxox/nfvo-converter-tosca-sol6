@@ -1,0 +1,300 @@
+tosca_definitions_version: tosca_simple_yaml_1_2
+
+data_types:
+  cisco.datatypes.nfv.VendorExtension:
+    derived_from: tosca.datatypes.Root
+    description: Vendor extensions applicable to any data type.
+    properties:
+      cisco_esc:
+        description: Reference to the VNFM that will process this extension.
+        type: map
+        required: true
+
+  cisco.datatypes.nfv.VnfHealOperationConfiguration:
+    derived_from: tosca.datatypes.nfv.VnfHealOperationConfiguration
+    properties:
+      recovery_action:
+        type: string
+        required: true
+      recovery_wait_time:
+        type: integer
+        required: true
+
+  cisco.datatypes.nfv.VnfcAdditionalConfigurableProperties:
+    derived_from: tosca.datatypes.nfv.VnfcAdditionalConfigurableProperties
+    properties:
+      vim_flavor:
+        type: string
+        required: true
+      bootup_time:
+        type: integer
+        required: true
+
+  cisco.datatypes.nfv.VnfLcmOperationsConfiguration:
+    derived_from: tosca.datatypes.nfv.VnfLcmOperationsConfiguration
+    properties:
+      heal:
+        type: cisco.datatypes.nfv.VnfHealOperationConfiguration
+
+  cisco.datatypes.nfv.VnfcConfigurableProperties:
+    derived_from: tosca.datatypes.nfv.VnfcConfigurableProperties
+    properties:
+      additional_vnfc_configurable_properties:
+        type: cisco.datatypes.nfv.VnfcAdditionalConfigurableProperties
+        required: false
+
+  cisco.datatypes.nfv.VnfOperationAdditionalParameters:
+    derived_from: tosca.datatypes.nfv.VnfOperationAdditionalParameters
+    properties:
+      parameters:
+        type: map
+        description: An array of key-value pairs
+        required: false
+        entry_schema:
+          type: string
+
+  cisco.datatypes.nfv.IpAddress:
+    derived_from: tosca.datatypes.Root
+    properties:
+      ip_address:
+        type: string
+        description: The stacked IP addresses for this interface
+        required: true
+      subnet:
+        type: string
+        description: The subnet reference from which  IP addresses for this interface should be assigned
+        required: false
+
+  cisco.datatypes.nfv.metric.Collector:
+    derived_from: tosca.datatypes.Root
+    properties:
+      metric_type: 
+        type: string
+        description: Type that monitor module should monitor, for example, ICMP_Ping
+        required: true
+      nicid:
+        type: string
+        description: Interface that should be used to monitor the metric
+        required: true
+      address_id:
+        type: string
+        description: Interface that should be used to monitor the metric
+        required: false
+      proxy:
+        type: string
+        description: IP address/host name of the proxy
+        required: false
+      poll_frequency:
+        type: integer
+        description: Frequency at which the metric should be polled
+        required: true
+      polling_unit:
+        type: string
+        description: Units of poll frequency (seconds or minutes)
+        required: false
+      continuous_alarm:
+        type: boolean
+        description: Whether continuous events need to be generated 
+        required: true
+      monitoring_public_ip:
+        type: boolean
+        description: Whether to ping the public IP address of the nic instead of the private one
+        required: false
+
+  cisco.datatypes.nfv.data.Kpi:
+    derived_from: tosca.datatypes.Root
+    description: Definition of proprietary KPIs
+    properties:
+      event_name:
+        type: string
+        description: The user-defined name of the KPI event
+        required: true
+      metric_value:
+        type: string
+        description: The threshold value to be evaluated
+        required: true
+      metric_cond:
+        type: string
+        description: The conditional operator to use to evaluate the threshold value
+        required: true
+        constraints:
+          - valid_values: [ 'GT', 'LT', 'EQ', 'GE', 'LE' ]
+      metric_type:
+        type: string
+        description: 
+        required: true
+        constraints:
+          - valid_values: [ 'INT8', 'UINT8','INT16', 'UINT16', 'INT32', 'UINT32', 'FLOAT', 'DOUBLE' ]
+      metric_occurences_true:
+        type: integer
+        description: Successive polling cycles monitoring before evaluating to the event to true
+        required: false
+      metric_occurences_false:
+        type: integer
+        description: Successive polling cycles monitoring before evaluating to the event to false
+        required: false
+      metric_proxy:
+        type: string
+        description: The IP address/host name of a proxy node from which to retrieve status information
+        required: false
+      metric_collector:
+        type: cisco.datatypes.nfv.metric.Collector
+        description: The metrics that needs to be monitored and at which frequency
+        required: true
+
+  cisco.datatypes.nfv.data.Kpi_rules:
+    derived_from: tosca.datatypes.Root
+    description: Definition of proprietary rules to be executed in reaction to a KPI metric measurement
+    properties:
+      event_name:
+        type: string
+        description: The user-defined name of the KPI event, will have been defined in the KPI data
+        required: true
+      action:
+        type: list
+        entry_schema:
+          type: string
+          description: Action associated with the event
+
+  cisco.datatypes.nfv.data.Admin_rules:
+    derived_from: cisco.datatypes.nfv.data.Kpi_rules
+    description: Definition of proprietary rules to be executed in reaction to a KPI metric measurement
+
+interface_types:
+  cisco.interfaces.nfv.Vnflcm:
+    derived_from: tosca.interfaces.nfv.Vnflcm
+    instantiate:
+      inputs:
+        script_parameters:
+          type: map
+          description: Parameters for LCM policy scripts
+          required: false
+          entry_schema:
+            type: string
+        additional_parameters:
+          type: cisco.datatypes.nfv.VnfOperationAdditionalParameters
+    instantiate_start:
+      inputs:
+        script_parameters:
+          type: map
+          description: Parameters for LCM policy scripts
+          required: false
+          entry_schema:
+            type: string
+    instantiate_end:
+      inputs:
+        script_parameters:
+          type: map
+          description: Parameters for LCM policy scripts
+          required: false
+          entry_schema:
+            type: string
+    terminate:
+      inputs:
+        script_parameters:
+          type: map
+          description: Parameters for LCM policy scripts
+          required: false
+          entry_schema:
+            type: string
+        additional_parameters:
+          type: cisco.datatypes.nfv.VnfOperationAdditionalParameters
+    terminate_start:
+      inputs:
+        script_parameters:
+          type: map
+          description: Parameters for LCM policy scripts
+          required: false
+          entry_schema:
+            type: string
+    terminate_end:
+      inputs:
+        script_parameters:
+          type: map
+          description: Parameters for LCM policy scripts
+          required: false
+          entry_schema:
+            type: string
+
+node_types:
+  cisco.nodes.nfv.Vdu.Compute:
+    derived_from: tosca.nodes.nfv.Vdu.Compute
+    properties:
+      configurable_properties:
+        type: cisco.datatypes.nfv.VnfcConfigurableProperties
+        description: Describes the configurable properties of all VNFC instances based on this VDU
+        required: false
+      kpi_data:
+        type: map # key: event_name
+        description: The different KPIs applicable to this VDU 
+        required: false
+        entry_schema:
+          type: cisco.datatypes.nfv.data.Kpi
+          description: A single KPI
+      admin_rules:
+        type: map # key: event_name
+        description: Actions for events
+        required: false
+        entry_schema:
+          type: cisco.datatypes.nfv.data.Admin_rules
+          description: Define actions for events
+      name_override:
+        type: string
+        description: An optional custom name that be be configured on the VIM
+        required: false
+      vendor_section:
+        type: cisco.datatypes.nfv.VendorExtension
+        required: false
+
+  cisco.nodes.nfv.Vdu.VirtualBlockStorage:
+    derived_from: tosca.nodes.nfv.Vdu.VirtualBlockStorage
+    properties:
+      vendor_section:
+        type: cisco.datatypes.nfv.VendorExtension
+        required: false
+
+  cisco.nodes.nfv.VduCp:
+    derived_from: tosca.nodes.nfv.VduCp
+    properties:
+      management:
+        type: boolean
+        description: Whether this interface is a management port
+        required: false
+      ip_subnet:
+        type: list
+        required: false
+        entry_schema:
+          type: cisco.datatypes.nfv.IpAddress
+          description: The stacked IP addresses for this interface 
+      allowed_address_pairs:
+        type: list
+        required: false
+        entry_schema:
+          type: cisco.datatypes.nfv.IpAddress
+          description: MAC/ IP address (cidr) pairs that are allowed to pass through a port regardless of subnet
+      name_override:
+        type: string
+        description: An optional custom name that be be configured on the VIM
+        required: false
+      nw_card_model: 
+        type: string
+        description: Describes the type of the virtual network card
+        required: false
+        constraints:
+          - valid_values: [ virtio, e1000, ne2k_pci, i82551, i82557b, i82559er, rtl8139, pcnet ]
+      iface_type:
+        type: string
+        description: An optional type for vCloudDirector
+        required: false
+        constraints:
+          - valid_values: [ virtual, passthru, direct, macvtap ]
+
+policy_types:
+  cisco.policies.nfv.SecurityGroupRule:
+    derived_from: tosca.policies.nfv.SecurityGroupRule
+    description: The SecurityGroupRule type is a policy type; only OOB SGRs are currently supported
+    properties:
+      group_name:
+        type: string
+        description: The IdentifierInVim of the OOB security group rule.
+        required: false

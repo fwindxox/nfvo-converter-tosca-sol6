@@ -1,0 +1,1536 @@
+tosca_definitions_version: tosca_simple_yaml_1_2
+description: VPC VNFD - 4 VDUs (SOL001 v0.10.0) for Openstack
+
+imports:
+  - cisco_nfv_sol001_types.yaml
+  - etsi_nfv_sol001_vnfd_0_10_0_types.yaml
+
+metadata:
+  template_name: standalone_vpc_vnfd_esc_4_4
+  template_author: Rakuten Systems
+  template_version: '1.0'
+
+dsl_definitions:
+  descriptor_id: &descriptor_id VEPC-DI
+  provider: &provider cisco
+  product_name: &product_name VPC
+  software_version: &software_version '1.0'
+  descriptor_version: &descriptor_version '1.1'
+  flavour_id: &flavour_id default
+  flavour_description: &flavour_description 'Default VNF Deployment Flavour'
+  vnfm: &vnfm '9:Cisco Elastic Services Controller:v04.04.01'
+
+node_types:
+  cisco.VPC.1_0.1_0:
+    derived_from: tosca.nodes.nfv.VNF
+    properties:
+      descriptor_id:
+        type: string
+        constraints: [ valid_values: [ *descriptor_id ] ]
+        default: *descriptor_id
+      provider:
+        type: string
+        constraints: [ valid_values: [ *provider ] ]
+        default: *provider
+      product_name:
+        type: string
+        constraints: [ valid_values: [ *product_name ] ]
+        default: *product_name
+      software_version:
+        type: string
+        constraints: [ valid_values: [ *software_version ] ]
+        default: *software_version
+      descriptor_version:
+        type: string
+        constraints: [ valid_values: [ *descriptor_version ] ]
+        default: *descriptor_version
+      flavour_id:
+        type: string
+        constraints: [ valid_values: [ *flavour_id ] ]
+        default: *flavour_id
+      flavour_description:
+        type: string
+        constraints: [ valid_values: [ *flavour_description ] ]
+        default: *flavour_description
+      vnfm_info:
+        type: list
+        entry_schema:
+          type: string
+        constraints: [ valid_values: [ *vnfm ] ]
+        default: [ *vnfm ]
+      configurable_properties:
+        type: tosca.datatypes.nfv.VnfConfigurableProperties
+        description: Describes the configurable properties of the VNF
+        required: false
+      lcm_operations_configuration:
+        type: cisco.datatypes.nfv.VnfLcmOperationsConfiguration
+    interfaces:
+      Vnflcm:
+        type: cisco.interfaces.nfv.Vnflcm
+    artifacts:
+
+topology_template:
+###################
+# Template Inputs #
+###################
+  inputs:
+
+    VIM_FLAVOR_CF:
+      description: VIM Flavour for CF VDUs
+      type: string
+      #example: ab-auto-test-vnfm3-control-function
+    VIM_FLAVOR_SF:
+      description: VIM Flavour for SF VDUs
+      type: string
+      #example: ab-auto-test-vnfm3-session-function
+    BOOTUP_TIME_CF:
+      description: The time taken for the image to boot
+      type: integer
+      #example: 1800
+    BOOTUP_TIME_SF:
+      description: The time taken for the image to boot
+      type: integer
+      #example: 1800
+    CF_IMAGE_NAME:
+      description: control function image name
+    SF_IMAGE_NAME:
+      description: session function image name
+
+    VIM_NETWORK_ORCH_SEC_GRP_0:
+      description: VPC ORCHESTRATION network ingress security group
+    VIM_NETWORK_ORCH_SEC_GRP_1:
+      description: VPC ORCHESTRATION network egress security group
+    # DI_INT1_MSS_MGMT_CIDR:
+    #   description: The IP subnet assigned to the internal VL
+    # DI_INT1_DHCP_ENABLED:
+    #   description: The settings on the internal VL for IP allocation
+    # DI_INT2_MSS_MGMT_CIDR:
+    #   description: The IP subnet assigned to the internal VL
+    # DI_INT2_DHCP_ENABLED:
+    #   description: The settings on the internal VL for IP allocation
+
+    #
+    # LCS Policy Properties
+    #
+    CHASSIS_KEY:
+      description: VPC Chassis key
+
+    # EM_USER:
+    #   type: string
+    #   description: The user name for the RPC on the EM VNF
+    #   #example: oper
+    # EM_PASS:
+    #   type: string
+    #   description: The user name for the RPC on the EM VNF
+    #   #example: fgjdfgkajdfdgdfg
+    # EM_RPC_HOST:
+    #   type: string
+    #   description: The IP address or hostname for the RPC on the EM VNF
+    #   #example: 127..0.0.1
+
+    #
+    # Allowed address pairs
+    #
+    C1_NICID_0_ALLOWED_ADDRS:
+      description: The IP subnet that can reach the interface regardless of its allocated subnet
+    C1_NICID_1_ALLOWED_ADDRS:
+      description: The IP subnet that can reach the interface regardless of its allocated subnet
+    C1_NICID_2_ALLOWED_ADDRS:
+      description: The IP subnet that can reach the interface regardless of its allocated subnet
+    C1_NICID_3_ALLOWED_ADDRS:
+      description: The IP subnet that can reach the interface regardless of its allocated subnet
+    C2_NICID_0_ALLOWED_ADDRS:
+      description: The IP subnet that can reach the interface regardless of its allocated subnet
+    C2_NICID_1_ALLOWED_ADDRS:
+      description: The IP subnet that can reach the interface regardless of its allocated subnet
+    C2_NICID_2_ALLOWED_ADDRS:
+      description: The IP subnet that can reach the interface regardless of its allocated subnet
+    C2_NICID_3_ALLOWED_ADDRS:
+      description: The IP subnet that can reach the interface regardless of its allocated subnet
+    S3_NICID_0_ALLOWED_ADDRS:
+      description: The IP subnet that can reach the interface regardless of its allocated subnet
+    S3_NICID_1_ALLOWED_ADDRS:
+      description: The IP subnet that can reach the interface regardless of its allocated subnet
+    S3_NICID_2_ALLOWED_ADDRS:
+      description: The IP subnet that can reach the interface regardless of its allocated subnet
+    S3_NICID_3_ALLOWED_ADDRS:
+      description: The IP subnet that can reach the interface regardless of its allocated subnet
+    S3_NICID_4_ALLOWED_ADDRS:
+      description: The IP subnet that can reach the interface regardless of its allocated subnet
+    S3_NICID_5_ALLOWED_ADDRS:
+      description: The IP subnet that can reach the interface regardless of its allocated subnet
+    S3_NICID_6_ALLOWED_ADDRS:
+      description: The IP subnet that can reach the interface regardless of its allocated subnet
+    S4_NICID_0_ALLOWED_ADDRS:
+      description: The IP subnet that can reach the interface regardless of its allocated subnet
+    S4_NICID_1_ALLOWED_ADDRS:
+      description: The IP subnet that can reach the interface regardless of its allocated subnet
+    S4_NICID_2_ALLOWED_ADDRS:
+      description: The IP subnet that can reach the interface regardless of its allocated subnet
+    S4_NICID_3_ALLOWED_ADDRS:
+      description: The IP subnet that can reach the interface regardless of its allocated subnet
+    S4_NICID_4_ALLOWED_ADDRS:
+      description: The IP subnet that can reach the interface regardless of its allocated subnet
+    S4_NICID_5_ALLOWED_ADDRS:
+      description: The IP subnet that can reach the interface regardless of its allocated subnet
+    S4_NICID_6_ALLOWED_ADDRS:
+      description: The IP subnet that can reach the interface regardless of its allocated subnet
+    S5_NICID_0_ALLOWED_ADDRS:
+      description: The IP subnet that can reach the interface regardless of its allocated subnet
+    S5_NICID_1_ALLOWED_ADDRS:
+      description: The IP subnet that can reach the interface regardless of its allocated subnet
+    S5_NICID_2_ALLOWED_ADDRS:
+      description: The IP subnet that can reach the interface regardless of its allocated subnet
+    S5_NICID_3_ALLOWED_ADDRS:
+      description: The IP subnet that can reach the interface regardless of its allocated subnet
+    S5_NICID_4_ALLOWED_ADDRS:
+      description: The IP subnet that can reach the interface regardless of its allocated subnet
+    S5_NICID_5_ALLOWED_ADDRS:
+      description: The IP subnet that can reach the interface regardless of its allocated subnet
+    S5_NICID_6_ALLOWED_ADDRS:
+      description: The IP subnet that can reach the interface regardless of its allocated subnet
+    S6_NICID_0_ALLOWED_ADDRS:
+      description: The IP subnet that can reach the interface regardless of its allocated subnet
+    S6_NICID_1_ALLOWED_ADDRS:
+      description: The IP subnet that can reach the interface regardless of its allocated subnet
+    S6_NICID_2_ALLOWED_ADDRS:
+      description: The IP subnet that can reach the interface regardless of its allocated subnet
+    S6_NICID_3_ALLOWED_ADDRS:
+      description: The IP subnet that can reach the interface regardless of its allocated subnet
+    S6_NICID_4_ALLOWED_ADDRS:
+      description: The IP subnet that can reach the interface regardless of its allocated subnet
+    S6_NICID_5_ALLOWED_ADDRS:
+      description: The IP subnet that can reach the interface regardless of its allocated subnet
+    S6_NICID_6_ALLOWED_ADDRS:
+      description: The IP subnet that can reach the interface regardless of its allocated subnet
+
+    #
+    # CF Day0 Config Parameters
+    #
+    CF_DOMAIN_NAME:
+      type: string
+      description: CF Domain Name for Day0 Config (staros_config.txt)
+      #example: cisco.com
+    CF_NAME_SERVER:
+      type: string
+      #example: 171.70.168.183
+      description: CF Nameserver for Day0 Config (staros_config.txt)
+    CF_VIP_ADDR:
+      type: string
+      description: CF VIP Address for Day0 Config (staros_config.txt)
+      #example: 172.77.11.11
+    CF1_SLOT_CARD_NUMBER:
+      type: integer
+      description: CF 1 Slot Card Number for Day0 Config (staros_config.txt, staros_param.cfg)
+      #example: 1
+    CF2_SLOT_CARD_NUMBER:
+      type: integer
+      description: CF 2 Slot Card Number for Day0 Config (staros_config.txt, staros_param.cfg)
+      #example: 2
+    CF_CARD_TYPE_NUM:
+      type: integer
+      description: CF Card Type Number for Day0 Config (staros_param.cfg)
+      #example: 0x40010100
+
+    #
+    # SF Day0 Config Parameters
+    #
+    SF_CARD_TYPE_NUM:
+      type: integer
+      description: SF Card Type Number for Day0 Config (staros_param.cfg)
+    SF1_SLOT_CARD_NUMBER:
+      type: integer
+      description: SF 1 Slot Card Number for Day0 Config (staros_param.cfg)
+    SF2_SLOT_CARD_NUMBER:
+      type: integer
+      description: SF 2 Slot Card Number for Day0 Config (staros_param.cfg)
+    SF3_SLOT_CARD_NUMBER:
+      type: integer
+      description: SF 3 Slot Card Number for Day0 Config (staros_param.cfg)
+    SF4_SLOT_CARD_NUMBER:
+      type: integer
+      description: SF 4 Slot Card Number for Day0 Config (staros_param.cfg)
+
+########################
+# Substitution Mapping #
+########################
+  substitution_mappings:
+    node_type: cisco.VPC.1_0.1_0
+    requirements:
+      - virtual_link: [ c1_nic1, virtual_link ]
+      - virtual_link: [ c1_nic2, virtual_link ]
+      - virtual_link: [ c2_nic1, virtual_link ]
+      - virtual_link: [ c2_nic2, virtual_link ]
+      - virtual_link: [ s3_nic1, virtual_link ]
+      - virtual_link: [ s3_nic2, virtual_link ]
+      - virtual_link: [ s3_nic3, virtual_link ]
+      - virtual_link: [ s3_nic5, virtual_link ]
+      - virtual_link: [ s3_nic6, virtual_link ]
+      - virtual_link: [ s4_nic1, virtual_link ]
+      - virtual_link: [ s4_nic2, virtual_link ]
+      - virtual_link: [ s4_nic3, virtual_link ]
+      - virtual_link: [ s4_nic5, virtual_link ]
+      - virtual_link: [ s4_nic6, virtual_link ]
+      - virtual_link: [ s5_nic1, virtual_link ]
+      - virtual_link: [ s5_nic2, virtual_link ]
+      - virtual_link: [ s5_nic3, virtual_link ]
+      - virtual_link: [ s5_nic5, virtual_link ]
+      - virtual_link: [ s5_nic6, virtual_link ]
+      - virtual_link: [ s6_nic1, virtual_link ]
+      - virtual_link: [ s6_nic2, virtual_link ]
+      - virtual_link: [ s6_nic3, virtual_link ]
+      - virtual_link: [ s6_nic5, virtual_link ]
+      - virtual_link: [ s6_nic6, virtual_link ]
+
+##########
+# Nodes: #
+##########
+  node_templates:
+
+#####################
+# VNF configuration #
+#####################
+    vnf:
+      type: cisco.VPC.1_0.1_0
+      properties:
+        descriptor_id: VEPC-DI
+        descriptor_version: '1.1'
+        provider: cisco
+        product_name: VPC
+        software_version: '1.0'
+        product_info_name: 'Virtual Packet Core (VPC); 32 vCPUs, 64Gb RAM, 66Gb vStorage'
+        vnfm_info:
+          - '9:Cisco Elastic Services Controller:v04.04.01'
+        configurable_properties:
+          is_autoscale_enabled: false
+          is_autoheal_enabled: false
+        lcm_operations_configuration:
+          heal:
+            recovery_action: REBOOT_THEN_REDEPLOY
+            recovery_wait_time: 1
+        flavour_id: default
+        flavour_description: 'Default VNF Deployment Flavour'
+      interfaces:
+        Vnflcm:
+          instantiate:
+            implementation: {get_artifact: [SELF, GEN_VPC_CHASSIS_ID]}
+            inputs:
+              script_parameters:
+                CHASSIS_KEY: { get_input: CHASSIS_KEY }
+              additional_parameters:
+                  VIM_FLAVOR_CF: { get_input: VIM_FLAVOR_CF }
+                  VIM_FLAVOR_SF: { get_input: VIM_FLAVOR_SF }
+                  BOOTUP_TIME_CF: { get_input: BOOTUP_TIME_CF }
+                  BOOTUP_TIME_SF: { get_input: BOOTUP_TIME_SF }
+                  # EM_USER: { get_input: EM_USER }
+                  # EM_PASS: { get_input: EM_PASS }
+                  # EM_RPC_HOST: { get_input: EM_RPC_HOST }
+                  CF_DOMAIN_NAME: { get_input: CF_DOMAIN_NAME }
+                  CF_NAME_SERVER: { get_input: CF_NAME_SERVER }
+                  CF_VIP_ADDR: { get_input: CF_VIP_ADDR }
+                  CF1_SLOT_CARD_NUMBER: { get_input: CF1_SLOT_CARD_NUMBER }
+                  CF2_SLOT_CARD_NUMBER: { get_input: CF2_SLOT_CARD_NUMBER }
+                  CF_CARD_TYPE_NUM: { get_input: CF_CARD_TYPE_NUM }
+                  SF_CARD_TYPE_NUM: { get_input: SF_CARD_TYPE_NUM }
+                  SF1_SLOT_CARD_NUMBER: { get_input: SF1_SLOT_CARD_NUMBER }
+                  SF2_SLOT_CARD_NUMBER: { get_input: SF2_SLOT_CARD_NUMBER }
+          instantiate_start:
+            implementation: {get_artifact: [SELF, GEN_VPC_SSH_KEYS]}
+      artifacts:
+        GEN_VPC_CHASSIS_ID:
+          type: tosca.artifacts.Implementation.Python
+          description: Generate chassis identifier
+          file: ../Files/Scripts/esc_vpc_chassis_id.py
+        GEN_VPC_SSH_KEYS:
+          type: tosca.artifacts.Implementation.Bash
+          description: VPC SSH key generation, using a shell script
+          file: ../Files/Scripts/esc-vpc-di-internal-keys.sh
+
+#####################
+# VDU configuration #
+#####################
+    c1:
+      type: cisco.nodes.nfv.Vdu.Compute
+      properties:
+        name: 'control-function 1'
+        description: 'Vdu1 of an active:standby (1:1) redundant pair of CF VMs.'
+        boot_order:
+          - vnfd1-deployment-control-function-1-cf-boot
+        configurable_properties:
+          additional_vnfc_configurable_properties:
+            vim_flavor: { get_input: VIM_FLAVOR_CF }
+            bootup_time: { get_input: BOOTUP_TIME_CF }
+        vdu_profile:
+          min_number_of_instances: 1
+          max_number_of_instances: 1
+        kpi_data:
+          VM_ALIVE-1:
+            event_name: 'VM_ALIVE-1'
+            metric_value: 1
+            metric_cond: 'GT'
+            metric_type: 'UINT32'
+            metric_occurences_true: 1
+            metric_occurences_false: 30
+            metric_collector: 
+              metric_type: 'ICMPPing'
+              nicid: 1
+              address_id: 0
+              poll_frequency: 10
+              polling_unit: 'seconds'
+              continuous_alarm: false
+        admin_rules:
+          VM_ALIVE-1:
+            event_name: 'VM_ALIVE-1'
+            action:
+              - 'ALWAYS log'
+              - 'FALSE recover autohealing'
+              - 'TRUE esc_vm_alive_notification'
+        vendor_section:
+          cisco_esc:
+            config_data:
+              staros_config.txt:
+                file: ../Files/Scripts/new_staros_config.txt
+                variables:
+                  CF_DOMAIN_NAME: { get_input: CF_DOMAIN_NAME }
+                  CF_NAME_SERVER: { get_input: CF_NAME_SERVER }
+                  CF_VIP_ADDR: { get_input: CF_VIP_ADDR }
+                  SLOT_CARD_NUMBER: { get_input: CF1_SLOT_CARD_NUMBER }
+              staros_param.cfg:
+                file: ../Files/Scripts/new_param_cf.cfg
+                variables:
+                  CARD_TYPE_NUM: { get_input: CF_CARD_TYPE_NUM }
+                  SLOT_CARD_NUMBER: { get_input: CF1_SLOT_CARD_NUMBER }
+      capabilities:
+        virtual_compute:
+          properties:
+            virtual_cpu:
+              num_virtual_cpu: 8
+            virtual_memory:
+              virtual_mem_size: 16 GB
+      requirements:
+        - virtual_storage: vnfd1-deployment-control-function-1-cf-cdr
+        - virtual_storage: vnfd1-deployment-control-function-1-cf-boot
+
+    c2:
+      type: cisco.nodes.nfv.Vdu.Compute
+      properties:
+        name: 'control-function 2'
+        description: 'Vdu2 of an active:standby (1:1) redundant pair of CF VMs.'
+        boot_order:
+          - vnfd1-deployment-control-function-0-cf-boot
+        configurable_properties:
+          additional_vnfc_configurable_properties:
+            vim_flavor: { get_input: VIM_FLAVOR_CF }
+            bootup_time: { get_input: BOOTUP_TIME_CF }
+        vdu_profile:
+          min_number_of_instances: 1
+          max_number_of_instances: 1
+        kpi_data:
+          VM_ALIVE-1:
+            event_name: 'VM_ALIVE-1'
+            metric_value: 1
+            metric_cond: 'GT'
+            metric_type: 'UINT32'
+            metric_occurences_true: 1
+            metric_occurences_false: 30
+            metric_collector: 
+              metric_type: 'ICMPPing'
+              nicid: 1
+              address_id: 0
+              poll_frequency: 10
+              polling_unit: 'seconds'
+              continuous_alarm: false
+        admin_rules:
+          VM_ALIVE-1:
+            event_name: 'VM_ALIVE-1'
+            action:
+              - 'ALWAYS log'
+              - 'FALSE recover autohealing'
+              - 'TRUE esc_vm_alive_notification'
+        vendor_section:
+          cisco_esc:
+            config_data:
+              staros_config.txt:
+                file: ../Files/Scripts/new_staros_config.txt
+                variables:
+                  CF_DOMAIN_NAME: { get_input: CF_DOMAIN_NAME }
+                  CF_NAME_SERVER: { get_input: CF_NAME_SERVER }
+                  CF_VIP_ADDR: { get_input: CF_VIP_ADDR }
+                  SLOT_CARD_NUMBER: { get_input: CF2_SLOT_CARD_NUMBER }
+              staros_param.cfg:
+                file: ../Files/Scripts/new_param_cf.cfg
+                variables:
+                  CARD_TYPE_NUM: { get_input: CF_CARD_TYPE_NUM }
+                  SLOT_CARD_NUMBER: { get_input: CF2_SLOT_CARD_NUMBER }
+      capabilities: 
+        virtual_compute:
+          properties:
+            virtual_cpu:
+              num_virtual_cpu: 8
+            virtual_memory:
+              virtual_mem_size: 16 GB
+      requirements:
+        - virtual_storage: vnfd1-deployment-control-function-0-cf-cdr
+        - virtual_storage: vnfd1-deployment-control-function-0-cf-boot
+
+    s3:
+      type: cisco.nodes.nfv.Vdu.Compute
+      properties:
+        name: 'session-function 1'
+        description:  'Provide service context (user I/O ports) and handle protocol signaling and session processing tasks.'
+        configurable_properties:
+          additional_vnfc_configurable_properties:
+            vim_flavor: { get_input: VIM_FLAVOR_SF }
+            bootup_time: { get_input: BOOTUP_TIME_SF }
+        vdu_profile:
+          min_number_of_instances: 1
+          max_number_of_instances: 15
+        sw_image_data:
+          name: { get_input: SF_IMAGE_NAME }
+          version: '1.0'
+          checksum: 9af30fce37a4c5c831e095745744d6d2
+          container_format: bare
+          disk_format: qcow2
+          min_disk: 2 GB
+          size: 2 GB
+        kpi_data:
+          VM_ALIVE-1:
+            event_name: 'VM_ALIVE-1'
+            metric_value: 1
+            metric_cond: 'GT'
+            metric_type: 'UINT32'
+            metric_occurences_true: 1
+            metric_occurences_false: 30
+            metric_collector: 
+              metric_type: 'ICMPPing'
+              nicid: 1
+              address_id: 0
+              poll_frequency: 10
+              polling_unit: 'seconds'
+              continuous_alarm: false
+        admin_rules:
+          VM_ALIVE-1:
+            event_name: 'VM_ALIVE-1'
+            action:
+              - 'ALWAYS log'
+              - 'FALSE recover autohealing'
+              - 'TRUE esc_vm_alive_notification'
+        vendor_section:
+          cisco_esc:
+            config_data:
+              staros_param.cfg:
+                file: ../Files/Scripts/new_param_sf.cfg
+                variables:
+                  CARD_TYPE_NUM: { get_input: SF_CARD_TYPE_NUM }
+                  SLOT_CARD_NUMBER: { get_input: SF1_SLOT_CARD_NUMBER }
+      capabilities: 
+        virtual_compute:
+          properties:
+            virtual_cpu:
+              num_virtual_cpu: 8
+            virtual_memory:
+              virtual_mem_size: 16 GB
+      artifacts:
+        sw_image:
+            type: tosca.artifacts.nfv.SwImage
+            file: http://engci-maven-master.cisco.com/artifactory/nso-snapshot/NFVO-SOL003-VNF-Images-0.0.3/VEPC-DI/qvpc-di-xf.qcow2
+
+    s4:
+      type: cisco.nodes.nfv.Vdu.Compute
+      properties:
+        name: 'session-function 2'
+        description:  'Provide service context (user I/O ports) and handle protocol signaling and session processing tasks.'
+        configurable_properties:
+          additional_vnfc_configurable_properties:
+            vim_flavor: { get_input: VIM_FLAVOR_SF }
+            bootup_time: { get_input: BOOTUP_TIME_SF }
+        vdu_profile:
+          min_number_of_instances: 1
+          max_number_of_instances: 15
+        sw_image_data:
+          name: { get_input: SF_IMAGE_NAME }
+          version: '1.0'
+          checksum: 9af30fce37a4c5c831e095745744d6d2
+          container_format: bare
+          disk_format: qcow2
+          min_disk: 2 GB
+          size: 2 GB
+        kpi_data:
+          VM_ALIVE-1:
+            event_name: 'VM_ALIVE-1'
+            metric_value: 1
+            metric_cond: 'GT'
+            metric_type: 'UINT32'
+            metric_occurences_true: 1
+            metric_occurences_false: 30
+            metric_collector: 
+              metric_type: 'ICMPPing'
+              nicid: 1
+              address_id: 0
+              poll_frequency: 10
+              polling_unit: 'seconds'
+              continuous_alarm: false
+        admin_rules:
+          VM_ALIVE-1:
+            event_name: 'VM_ALIVE-1'
+            action:
+              - 'ALWAYS log'
+              - 'FALSE recover autohealing'
+              - 'TRUE esc_vm_alive_notification'
+        vendor_section:
+          cisco_esc:
+            config_data:
+              staros_param.cfg:
+                file: ../Files/Scripts/new_param_sf.cfg
+                variables:
+                  CARD_TYPE_NUM: { get_input: SF_CARD_TYPE_NUM }
+                  SLOT_CARD_NUMBER: { get_input: SF2_SLOT_CARD_NUMBER }
+      capabilities: 
+        virtual_compute:
+          properties:
+            virtual_cpu:
+              num_virtual_cpu: 8
+            virtual_memory:
+              virtual_mem_size: 16 GB
+      artifacts:
+        sw_image:
+            type: tosca.artifacts.nfv.SwImage
+            file: http://engci-maven-master.cisco.com/artifactory/nso-snapshot/NFVO-SOL003-VNF-Images-0.0.3/VEPC-DI/qvpc-di-xf.qcow2
+
+    s5:
+      type: cisco.nodes.nfv.Vdu.Compute
+      properties:
+        name: 'session-function 3'
+        description:  'Provide service context (user I/O ports) and handle protocol signaling and session processing tasks.'
+        configurable_properties:
+          additional_vnfc_configurable_properties:
+            vim_flavor: { get_input: VIM_FLAVOR_SF }
+            bootup_time: { get_input: BOOTUP_TIME_SF }
+        vdu_profile:
+          min_number_of_instances: 1
+          max_number_of_instances: 15
+        sw_image_data:
+          name: { get_input: SF_IMAGE_NAME }
+          version: '1.0'
+          checksum: 9af30fce37a4c5c831e095745744d6d2
+          container_format: bare
+          disk_format: qcow2
+          min_disk: 2 GB
+          size: 2 GB
+        kpi_data:
+          VM_ALIVE-1:
+            event_name: 'VM_ALIVE-1'
+            metric_value: 1
+            metric_cond: 'GT'
+            metric_type: 'UINT32'
+            metric_occurences_true: 1
+            metric_occurences_false: 30
+            metric_collector: 
+              metric_type: 'ICMPPing'
+              nicid: 1
+              address_id: 0
+              poll_frequency: 10
+              polling_unit: 'seconds'
+              continuous_alarm: false
+        admin_rules:
+          VM_ALIVE-1:
+            event_name: 'VM_ALIVE-1'
+            action:
+              - 'ALWAYS log'
+              - 'FALSE recover autohealing'
+              - 'TRUE esc_vm_alive_notification'
+        vendor_section:
+          cisco_esc:
+            config_data:
+              staros_param.cfg:
+                file: ../Files/Scripts/new_param_sf.cfg
+                variables:
+                  CARD_TYPE_NUM: { get_input: SF_CARD_TYPE_NUM }
+                  SLOT_CARD_NUMBER: { get_input: SF3_SLOT_CARD_NUMBER }
+      capabilities: 
+        virtual_compute:
+          properties:
+            virtual_cpu:
+              num_virtual_cpu: 8
+            virtual_memory:
+              virtual_mem_size: 16 GB
+      artifacts:
+        sw_image:
+            type: tosca.artifacts.nfv.SwImage
+            file: http://engci-maven-master.cisco.com/artifactory/nso-snapshot/NFVO-SOL003-VNF-Images-0.0.3/VEPC-DI/qvpc-di-xf.qcow2
+
+    s6:
+      type: cisco.nodes.nfv.Vdu.Compute
+      properties:
+        name: 'session-function 4'
+        description:  'Provide service context (user I/O ports) and handle protocol signaling and session processing tasks.'
+        configurable_properties:
+          additional_vnfc_configurable_properties:
+            vim_flavor: { get_input: VIM_FLAVOR_SF }
+            bootup_time: { get_input: BOOTUP_TIME_SF }
+        vdu_profile:
+          min_number_of_instances: 1
+          max_number_of_instances: 15
+        sw_image_data:
+          name: { get_input: SF_IMAGE_NAME }
+          version: '1.0'
+          checksum: 9af30fce37a4c5c831e095745744d6d2
+          container_format: bare
+          disk_format: qcow2
+          min_disk: 2 GB
+          size: 2 GB
+        kpi_data:
+          VM_ALIVE-1:
+            event_name: 'VM_ALIVE-1'
+            metric_value: 1
+            metric_cond: 'GT'
+            metric_type: 'UINT32'
+            metric_occurences_true: 1
+            metric_occurences_false: 30
+            metric_collector: 
+              metric_type: 'ICMPPing'
+              nicid: 1
+              address_id: 0
+              poll_frequency: 10
+              polling_unit: 'seconds'
+              continuous_alarm: false
+        admin_rules:
+          VM_ALIVE-1:
+            event_name: 'VM_ALIVE-1'
+            action:
+              - 'ALWAYS log'
+              - 'FALSE recover autohealing'
+              - 'TRUE esc_vm_alive_notification'
+        vendor_section:
+          cisco_esc:
+            config_data:
+              staros_param.cfg:
+                file: ../Files/Scripts/new_param_sf.cfg
+                variables:
+                  CARD_TYPE_NUM: { get_input: SF_CARD_TYPE_NUM }
+                  SLOT_CARD_NUMBER: { get_input: SF4_SLOT_CARD_NUMBER }
+      capabilities: 
+        virtual_compute:
+          properties:
+            virtual_cpu:
+              num_virtual_cpu: 8
+            virtual_memory:
+              virtual_mem_size: 16 GB
+      artifacts:
+        sw_image:
+            type: tosca.artifacts.nfv.SwImage
+            file: http://engci-maven-master.cisco.com/artifactory/nso-snapshot/NFVO-SOL003-VNF-Images-0.0.3/VEPC-DI/qvpc-di-xf.qcow2
+
+#########################
+# Virtual Block Storage #
+#########################
+    vnfd1-deployment-control-function-1-cf-boot:
+      type: cisco.nodes.nfv.Vdu.VirtualBlockStorage
+      properties:
+        virtual_block_storage_data:
+          size_of_storage: 16 GB
+          vdu_storage_requirements:
+            vol_id: '1'
+            bus: ide
+            boot_index: '0'
+            # NFVO-TODO this should be uncommented when using real hw openstack
+            #type: lvm
+        sw_image_data:
+          name: { get_input: CF_IMAGE_NAME }
+          version: '1.0'
+          checksum: 9af30fce37a4c5c831e095745744d6d2
+          container_format: bare
+          disk_format: qcow2
+          min_disk: 2 GB
+          size: 2 GB
+      artifacts:
+        sw_image:
+          type: tosca.artifacts.nfv.SwImage
+          file: http://engci-maven-master.cisco.com/artifactory/nso-snapshot/NFVO-SOL003-VNF-Images-0.0.3/VEPC-DI/qvpc-di-cf.qcow2
+
+    vnfd1-deployment-control-function-1-cf-cdr:
+      type: cisco.nodes.nfv.Vdu.VirtualBlockStorage
+      properties:
+        virtual_block_storage_data:
+          size_of_storage: 200 GB
+          vdu_storage_requirements:
+            vol_id: 0
+            bus: ide
+            # NFVO-TODO this should be uncommented when using real hw openstack
+            #type: lvm
+
+    vnfd1-deployment-control-function-0-cf-boot:
+      type: cisco.nodes.nfv.Vdu.VirtualBlockStorage
+      properties:
+        virtual_block_storage_data:
+          size_of_storage: 16 GB
+          vdu_storage_requirements:
+            vol_id: '1'
+            bus: ide
+            boot_index: '0'
+            # NFVO-TODO this should be uncommented when using real hw openstack
+            #type: lvm
+        sw_image_data:
+          name: { get_input: CF_IMAGE_NAME }
+          version: '1.0'
+          checksum: 9af30fce37a4c5c831e095745744d6d2
+          container_format: bare
+          disk_format: qcow2
+          min_disk: 2 GB
+          size: 2 GB
+      artifacts:
+        sw_image:
+          type: tosca.artifacts.nfv.SwImage
+          file: http://engci-maven-master.cisco.com/artifactory/nso-snapshot/NFVO-SOL003-VNF-Images-0.0.3/VEPC-DI/qvpc-di-cf.qcow2
+
+    vnfd1-deployment-control-function-0-cf-cdr:
+      type: cisco.nodes.nfv.Vdu.VirtualBlockStorage
+      properties:
+        virtual_block_storage_data:
+          size_of_storage: 200 GB
+          vdu_storage_requirements:
+            vol_id: 0
+            bus: ide
+            # NFVO-TODO this should be uncommented when using real hw openstack
+            #type: lvm
+
+######################################
+# Connection points for "c1" #
+######################################
+    c1_nic0:
+      type: cisco.nodes.nfv.VduCp
+      properties:
+        layer_protocols: [ ipv4 ]
+        protocol:
+          - associated_layer_protocol: ipv4
+        trunk_mode: false
+        order: 0
+        management: false
+        allowed_address_pairs:
+          - ip_address: { get_input: C1_NICID_0_ALLOWED_ADDRS }
+# NFVO-TODO this should be uncommented when using openstack with sriov ports.
+#        iface_type: direct 
+      requirements:
+        - virtual_binding: c1
+        - virtual_link: etsi-vpc-di-internal1
+
+    c1_nic1:
+      type: cisco.nodes.nfv.VduCp
+      properties:
+        layer_protocols: [ ipv4 ]
+        protocol:
+          - associated_layer_protocol: ipv4
+        trunk_mode: false
+        order: 1
+        management: true
+        allowed_address_pairs:
+          - ip_address: { get_input: C1_NICID_1_ALLOWED_ADDRS }
+      requirements:
+        - virtual_binding: c1
+
+    c1_nic2:
+      type: cisco.nodes.nfv.VduCp
+      properties:
+        layer_protocols: [ ipv4 ]
+        protocol:
+          - associated_layer_protocol: ipv4
+        trunk_mode: false
+        order: 2
+        management: false
+        allowed_address_pairs:
+          - ip_address: { get_input: C1_NICID_2_ALLOWED_ADDRS }
+      requirements:
+        - virtual_binding: c1
+
+
+    c1_nic3:
+      type: cisco.nodes.nfv.VduCp
+      properties:
+        layer_protocols: [ ipv4 ]
+        protocol:
+          - associated_layer_protocol: ipv4
+        trunk_mode: false
+        order: 3
+        management: false
+        allowed_address_pairs:
+          - ip_address: { get_input: C1_NICID_3_ALLOWED_ADDRS }
+# NFVO-TODO this should be uncommented when using openstack with sriov ports.
+#        iface_type: direct
+      requirements:
+        - virtual_binding: c1
+        - virtual_link: etsi-vpc-di-internal2
+
+######################################
+# Connection points for "c2" #
+######################################
+    c2_nic0:
+      type: cisco.nodes.nfv.VduCp
+      properties:
+        layer_protocols: [ ipv4 ]
+        protocol:
+          - associated_layer_protocol: ipv4
+        trunk_mode: false
+        order: 0
+        management: false
+        allowed_address_pairs:
+          - ip_address: { get_input: C2_NICID_0_ALLOWED_ADDRS }
+# NFVO-TODO this should be uncommented when using openstack with sriov ports.
+#        iface_type: direct
+      requirements:
+        - virtual_binding: c2
+        - virtual_link: etsi-vpc-di-internal1
+
+    c2_nic1:
+      type: cisco.nodes.nfv.VduCp
+      properties:
+        layer_protocols: [ ipv4 ]
+        protocol:
+          - associated_layer_protocol: ipv4
+        trunk_mode: false
+        order: 1
+        management: true
+        allowed_address_pairs:
+          - ip_address: { get_input: C2_NICID_1_ALLOWED_ADDRS }
+      requirements:
+        - virtual_binding: c2
+
+    c2_nic2:
+      type: cisco.nodes.nfv.VduCp
+      properties:
+        layer_protocols: [ ipv4 ]
+        protocol:
+          - associated_layer_protocol: ipv4
+        trunk_mode: false
+        order: 2
+        management: false
+        allowed_address_pairs:
+          - ip_address: { get_input: C2_NICID_2_ALLOWED_ADDRS }
+      requirements:
+        - virtual_binding: c2
+
+    c2_nic3:
+      type: cisco.nodes.nfv.VduCp
+      properties:
+        layer_protocols: [ ipv4 ]
+        protocol:
+          - associated_layer_protocol: ipv4
+        trunk_mode: false
+        order: 3
+        management: false
+        allowed_address_pairs:
+          - ip_address: { get_input: C2_NICID_3_ALLOWED_ADDRS }
+# NFVO-TODO this should be uncommented when using openstack with sriov ports.
+#        iface_type: direct
+      requirements:
+        - virtual_binding: c2
+        - virtual_link: etsi-vpc-di-internal2
+
+######################################
+# Connection points for "s3" #
+######################################
+    s3_nic0:
+      type: cisco.nodes.nfv.VduCp
+      properties:
+        layer_protocols: [ ipv4 ]
+        protocol:
+          - associated_layer_protocol: ipv4
+        trunk_mode: false
+        order: 0
+        management: false
+        allowed_address_pairs:
+          - ip_address: { get_input: S3_NICID_0_ALLOWED_ADDRS }
+# NFVO-TODO this should be uncommented when using openstack with sriov ports.
+#        iface_type: direct
+      requirements:
+        - virtual_binding: s3
+        - virtual_link: etsi-vpc-di-internal1
+
+    s3_nic1:
+      type: cisco.nodes.nfv.VduCp
+      properties:
+        layer_protocols: [ ipv4 ]
+        protocol:
+          - associated_layer_protocol: ipv4
+        trunk_mode: false
+        order: 1
+        management: true
+        allowed_address_pairs:
+          - ip_address: { get_input: S3_NICID_1_ALLOWED_ADDRS }
+      requirements:
+        - virtual_binding: s3
+
+    s3_nic2:
+      type: cisco.nodes.nfv.VduCp
+      properties:
+        layer_protocols: [ ipv4 ]
+        protocol:
+          - associated_layer_protocol: ipv4
+        trunk_mode: false
+        order: 2
+        management: false
+        allowed_address_pairs:
+          - ip_address: { get_input: S3_NICID_2_ALLOWED_ADDRS }
+# NFVO-TODO this should be uncommented when using openstack with sriov ports.
+#        iface_type: direct
+      requirements:
+        - virtual_binding: s3
+
+    s3_nic3:
+      type: cisco.nodes.nfv.VduCp
+      properties:
+        layer_protocols: [ ipv4 ]
+        protocol:
+          - associated_layer_protocol: ipv4
+        trunk_mode: false
+        order: 3
+        management: false
+        allowed_address_pairs:
+          - ip_address: { get_input: S3_NICID_3_ALLOWED_ADDRS }
+# NFVO-TODO this should be uncommented when using openstack with sriov ports.
+#        iface_type: direct
+      requirements:
+        - virtual_binding: s3
+
+    s3_nic4:
+      type: cisco.nodes.nfv.VduCp
+      properties:
+        layer_protocols: [ ipv4 ]
+        protocol:
+          - associated_layer_protocol: ipv4
+        trunk_mode: false
+        order: 4
+        management: false
+        allowed_address_pairs:
+          - ip_address: { get_input: S3_NICID_4_ALLOWED_ADDRS }
+# NFVO-TODO this should be uncommented when using openstack with sriov ports.
+#        iface_type: direct
+      requirements:
+        - virtual_binding: s3
+        - virtual_link: etsi-vpc-di-internal2
+
+    s3_nic5:
+      type: cisco.nodes.nfv.VduCp
+      properties:
+        layer_protocols: [ ipv4 ]
+        protocol:
+          - associated_layer_protocol: ipv4
+        trunk_mode: false
+        order: 5
+        management: false
+        allowed_address_pairs:
+          - ip_address: { get_input: S3_NICID_5_ALLOWED_ADDRS }
+# NFVO-TODO this should be uncommented when using openstack with sriov ports.
+#        iface_type: direct
+      requirements:
+        - virtual_binding: s3
+
+    s3_nic6:
+      type: cisco.nodes.nfv.VduCp
+      properties:
+        layer_protocols: [ ipv4 ]
+        protocol:
+          - associated_layer_protocol: ipv4
+        trunk_mode: false
+        order: 6
+        management: false
+        allowed_address_pairs:
+          - ip_address: { get_input: S3_NICID_6_ALLOWED_ADDRS }
+# NFVO-TODO this should be uncommented when using openstack with sriov ports.
+#        iface_type: direct
+      requirements:
+        - virtual_binding: s3
+
+######################################
+# Connection points for "s4" #
+######################################
+    s4_nic0:
+      type: cisco.nodes.nfv.VduCp
+      properties:
+        layer_protocols: [ ipv4 ]
+        protocol:
+          - associated_layer_protocol: ipv4
+        trunk_mode: false
+        order: 0
+        management: false
+        allowed_address_pairs:
+          - ip_address: { get_input: S4_NICID_0_ALLOWED_ADDRS }
+# NFVO-TODO this should be uncommented when using openstack with sriov ports.
+#        iface_type: direct
+      requirements:
+        - virtual_binding: s4
+        - virtual_link: etsi-vpc-di-internal1
+
+    s4_nic1:
+      type: cisco.nodes.nfv.VduCp
+      properties:
+        layer_protocols: [ ipv4 ]
+        protocol:
+          - associated_layer_protocol: ipv4
+        trunk_mode: false
+        order: 1
+        management: true
+        allowed_address_pairs:
+          - ip_address: { get_input: S4_NICID_1_ALLOWED_ADDRS }
+      requirements:
+        - virtual_binding: s4
+
+    s4_nic2:
+      type: cisco.nodes.nfv.VduCp
+      properties:
+        layer_protocols: [ ipv4 ]
+        protocol:
+          - associated_layer_protocol: ipv4
+        trunk_mode: false
+        order: 2
+        management: false
+        allowed_address_pairs:
+          - ip_address: { get_input: S4_NICID_2_ALLOWED_ADDRS }
+# NFVO-TODO this should be uncommented when using openstack with sriov ports.
+#        iface_type: direct
+      requirements:
+        - virtual_binding: s4
+
+    s4_nic3:
+      type: cisco.nodes.nfv.VduCp
+      properties:
+        layer_protocols: [ ipv4 ]
+        protocol:
+          - associated_layer_protocol: ipv4
+        trunk_mode: false
+        order: 3
+        management: false
+        allowed_address_pairs:
+          - ip_address: { get_input: S4_NICID_3_ALLOWED_ADDRS }
+# NFVO-TODO this should be uncommented when using openstack with sriov ports.
+#        iface_type: direct
+      requirements:
+        - virtual_binding: s4
+
+    s4_nic4:
+      type: cisco.nodes.nfv.VduCp
+      properties:
+        layer_protocols: [ ipv4 ]
+        protocol:
+          - associated_layer_protocol: ipv4
+        trunk_mode: false
+        order: 4
+        management: false
+        allowed_address_pairs:
+          - ip_address: { get_input: S4_NICID_4_ALLOWED_ADDRS }
+# NFVO-TODO this should be uncommented when using openstack with sriov ports.
+#        iface_type: direct
+      requirements:
+        - virtual_binding: s4
+        - virtual_link: etsi-vpc-di-internal2
+
+    s4_nic5:
+      type: cisco.nodes.nfv.VduCp
+      properties:
+        layer_protocols: [ ipv4 ]
+        protocol:
+          - associated_layer_protocol: ipv4
+        trunk_mode: false
+        order: 5
+        management: false
+        allowed_address_pairs:
+          - ip_address: { get_input: S4_NICID_5_ALLOWED_ADDRS }
+# NFVO-TODO this should be uncommented when using openstack with sriov ports.
+#        iface_type: direct
+      requirements:
+        - virtual_binding: s4
+
+    s4_nic6:
+      type: cisco.nodes.nfv.VduCp
+      properties:
+        layer_protocols: [ ipv4 ]
+        protocol:
+          - associated_layer_protocol: ipv4
+        trunk_mode: false
+        order: 6
+        management: false
+        allowed_address_pairs:
+          - ip_address: { get_input: S4_NICID_6_ALLOWED_ADDRS }
+# NFVO-TODO this should be uncommented when using openstack with sriov ports.
+#        iface_type: direct
+      requirements:
+        - virtual_binding: s4
+
+######################################
+# Connection points for "s5" #
+######################################
+    s5_nic0:
+      type: cisco.nodes.nfv.VduCp
+      properties:
+        layer_protocols: [ ipv4 ]
+        protocol:
+          - associated_layer_protocol: ipv4
+        trunk_mode: false
+        order: 0
+        management: false
+        allowed_address_pairs:
+          - ip_address: { get_input: S5_NICID_0_ALLOWED_ADDRS }
+# NFVO-TODO this should be uncommented when using openstack with sriov ports.
+#        iface_type: direct
+      requirements:
+        - virtual_binding: s5
+        - virtual_link: etsi-vpc-di-internal1
+
+    s5_nic1:
+      type: cisco.nodes.nfv.VduCp
+      properties:
+        layer_protocols: [ ipv4 ]
+        protocol:
+          - associated_layer_protocol: ipv4
+        trunk_mode: false
+        order: 1
+        management: true
+        allowed_address_pairs:
+          - ip_address: { get_input: S5_NICID_1_ALLOWED_ADDRS }
+      requirements:
+        - virtual_binding: s5
+
+    s5_nic2:
+      type: cisco.nodes.nfv.VduCp
+      properties:
+        layer_protocols: [ ipv4 ]
+        protocol:
+          - associated_layer_protocol: ipv4
+        trunk_mode: false
+        order: 2
+        management: false
+        allowed_address_pairs:
+          - ip_address: { get_input: S5_NICID_2_ALLOWED_ADDRS }
+# NFVO-TODO this should be uncommented when using openstack with sriov ports.
+#        iface_type: direct
+      requirements:
+        - virtual_binding: s5
+
+    s5_nic3:
+      type: cisco.nodes.nfv.VduCp
+      properties:
+        layer_protocols: [ ipv4 ]
+        protocol:
+          - associated_layer_protocol: ipv4
+        trunk_mode: false
+        order: 3
+        management: false
+        allowed_address_pairs:
+          - ip_address: { get_input: S5_NICID_3_ALLOWED_ADDRS }
+# NFVO-TODO this should be uncommented when using openstack with sriov ports.
+#        iface_type: direct
+      requirements:
+        - virtual_binding: s5
+
+    s5_nic4:
+      type: cisco.nodes.nfv.VduCp
+      properties:
+        layer_protocols: [ ipv4 ]
+        protocol:
+          - associated_layer_protocol: ipv4
+        trunk_mode: false
+        order: 4
+        management: false
+        allowed_address_pairs:
+          - ip_address: { get_input: S5_NICID_4_ALLOWED_ADDRS }
+# NFVO-TODO this should be uncommented when using openstack with sriov ports.
+#        iface_type: direct
+      requirements:
+        - virtual_binding: s5
+        - virtual_link: etsi-vpc-di-internal2
+
+    s5_nic5:
+      type: cisco.nodes.nfv.VduCp
+      properties:
+        layer_protocols: [ ipv4 ]
+        protocol:
+          - associated_layer_protocol: ipv4
+        trunk_mode: false
+        order: 5
+        management: false
+        allowed_address_pairs:
+          - ip_address: { get_input: S5_NICID_5_ALLOWED_ADDRS }
+# NFVO-TODO this should be uncommented when using openstack with sriov ports.
+#        iface_type: direct
+      requirements:
+        - virtual_binding: s5
+
+    s5_nic6:
+      type: cisco.nodes.nfv.VduCp
+      properties:
+        layer_protocols: [ ipv4 ]
+        protocol:
+          - associated_layer_protocol: ipv4
+        trunk_mode: false
+        order: 6
+        management: false
+        allowed_address_pairs:
+          - ip_address: { get_input: S5_NICID_6_ALLOWED_ADDRS }
+# NFVO-TODO this should be uncommented when using openstack with sriov ports.
+#        iface_type: direct
+      requirements:
+        - virtual_binding: s5
+
+######################################
+# Connection points for "s6" #
+######################################
+    s6_nic0:
+      type: cisco.nodes.nfv.VduCp
+      properties:
+        layer_protocols: [ ipv4 ]
+        protocol:
+          - associated_layer_protocol: ipv4
+        trunk_mode: false
+        order: 0
+        management: false
+        allowed_address_pairs:
+          - ip_address: { get_input: S6_NICID_0_ALLOWED_ADDRS }
+# NFVO-TODO this should be uncommented when using openstack with sriov ports.
+#        iface_type: direct
+      requirements:
+        - virtual_binding: s6
+        - virtual_link: etsi-vpc-di-internal1
+
+    s6_nic1:
+      type: cisco.nodes.nfv.VduCp
+      properties:
+        layer_protocols: [ ipv4 ]
+        protocol:
+          - associated_layer_protocol: ipv4
+        trunk_mode: false
+        order: 1
+        management: true
+        allowed_address_pairs:
+          - ip_address: { get_input: S6_NICID_1_ALLOWED_ADDRS }
+      requirements:
+        - virtual_binding: s6
+
+    s6_nic2:
+      type: cisco.nodes.nfv.VduCp
+      properties:
+        layer_protocols: [ ipv4 ]
+        protocol:
+          - associated_layer_protocol: ipv4
+        trunk_mode: false
+        order: 2
+        management: false
+        allowed_address_pairs:
+          - ip_address: { get_input: S6_NICID_2_ALLOWED_ADDRS }
+# NFVO-TODO this should be uncommented when using openstack with sriov ports.
+#        iface_type: direct
+      requirements:
+        - virtual_binding: s6
+
+    s6_nic3:
+      type: cisco.nodes.nfv.VduCp
+      properties:
+        layer_protocols: [ ipv4 ]
+        protocol:
+          - associated_layer_protocol: ipv4
+        trunk_mode: false
+        order: 3
+        management: false
+        allowed_address_pairs:
+          - ip_address: { get_input: S6_NICID_3_ALLOWED_ADDRS }
+# NFVO-TODO this should be uncommented when using openstack with sriov ports.
+#        iface_type: direct
+      requirements:
+        - virtual_binding: s6
+
+    s6_nic4:
+      type: cisco.nodes.nfv.VduCp
+      properties:
+        layer_protocols: [ ipv4 ]
+        protocol:
+          - associated_layer_protocol: ipv4
+        trunk_mode: false
+        order: 4
+        management: false
+        allowed_address_pairs:
+          - ip_address: { get_input: S6_NICID_4_ALLOWED_ADDRS }
+# NFVO-TODO this should be uncommented when using openstack with sriov ports.
+#        iface_type: direct
+      requirements:
+        - virtual_binding: s6
+        - virtual_link: etsi-vpc-di-internal2
+
+    s6_nic5:
+      type: cisco.nodes.nfv.VduCp
+      properties:
+        layer_protocols: [ ipv4 ]
+        protocol:
+          - associated_layer_protocol: ipv4
+        trunk_mode: false
+        order: 5
+        management: false
+        allowed_address_pairs:
+          - ip_address: { get_input: S6_NICID_5_ALLOWED_ADDRS }
+# NFVO-TODO this should be uncommented when using openstack with sriov ports.
+#        iface_type: direct
+      requirements:
+        - virtual_binding: s6
+
+    s6_nic6:
+      type: cisco.nodes.nfv.VduCp
+      properties:
+        layer_protocols: [ ipv4 ]
+        protocol:
+          - associated_layer_protocol: ipv4
+        trunk_mode: false
+        order: 6
+        management: false
+        allowed_address_pairs:
+          - ip_address: { get_input: S6_NICID_6_ALLOWED_ADDRS }
+# NFVO-TODO this should be uncommented when using openstack with sriov ports.
+#        iface_type: direct
+      requirements:
+        - virtual_binding: s6
+
+########################################
+# Internal Virtual Links configuration #
+########################################
+    etsi-vpc-di-internal1:
+      type: tosca.nodes.nfv.VnfVirtualLink
+      properties:
+        connectivity_type:
+          layer_protocols: [ ipv4 ]
+        description: DI Internal 1 Network VL
+        vl_profile:
+          max_bitrate_requirements:
+            root: 100000
+          min_bitrate_requirements:
+            root: 0
+          # virtual_link_protocol_data:
+          #   - associated_layer_protocol: ipv4
+          #   - l3_protocol_data:
+          #       ip_version: ipv4
+          #       cidr: { get_input: DI_INT1_MSS_MGMT_CIDR }
+          #       dhcp_enabled: { get_input: DI_INT1_DHCP_ENABLED }
+
+    etsi-vpc-di-internal2:
+      type: tosca.nodes.nfv.VnfVirtualLink
+      properties:
+        connectivity_type:
+          layer_protocols: [ ipv4 ]
+        description: DI Internal 2 Network VL
+        vl_profile:
+          max_bitrate_requirements:
+            root: 100000
+          min_bitrate_requirements:
+            root: 0
+          # virtual_link_protocol_data:
+          #   - associated_layer_protocol: ipv4
+          #   - l3_protocol_data:
+          #       ip_version: ipv4
+          #       cidr: { get_input: DI_INT2_MSS_MGMT_CIDR }
+          #       dhcp_enabled: { get_input: DI_INT2_DHCP_ENABLED }
+
+########################
+# Policy configuration #
+########################
+  policies:
+    - scaling_aspects:
+        type: tosca.policies.nfv.ScalingAspects
+        properties:
+          aspects:
+            session-function:
+              name: 'session-function'
+              description: 'Provide service context (user I/O ports) and handle protocol signaling and session processing tasks.'
+              max_scale_level: 14
+              step_deltas:
+                - delta_1
+            control-function:
+              name: 'control-function'
+              description: 'Controller tasks, Local context VPNMGR, System boot image and configuration storage on vHDD, etc.'
+              max_scale_level: 0
+
+    - instantiation_levels:
+        type: tosca.policies.nfv.InstantiationLevels
+        properties:
+          levels:
+            default:
+              description: 'Default instantiation level'
+              scale_info:
+                session-function:
+                  scale_level: 0
+                control-function:
+                  scale_level: 0
+          default_level: default
+
+######
+# CF #
+######
+    - cf_initial_delta:
+        type: tosca.policies.nfv.VduInitialDelta
+        properties:
+          initial_delta:
+            number_of_instances: 1
+        targets: [ c1, c2 ]
+
+    - cf_instantiation_levels:
+        type: tosca.policies.nfv.VduInstantiationLevels
+        properties:
+          levels:
+            default:
+              number_of_instances: 1
+        targets: [ c1, c2 ]
+
+######
+# SF #
+######
+    - sf_initial_delta:
+        type: tosca.policies.nfv.VduInitialDelta
+        properties:
+          initial_delta:
+            number_of_instances: 1
+        targets: [ s3, s4, s5, s6 ]
+
+    - sf_scaling_aspect_deltas:
+        type: tosca.policies.nfv.VduScalingAspectDeltas
+        properties:
+          aspect: session-function
+          deltas:
+            delta_1:
+              number_of_instances: 1
+        targets: [ s3, s4, s5, s6 ]
+
+    - sf_instantiation_levels:
+        type: tosca.policies.nfv.VduInstantiationLevels
+        properties:
+          levels:
+            default:
+              number_of_instances: 1
+        targets: [ s3, s4, s5, s6 ]
+
+    - policy_antiaffinity_1:
+        type: tosca.policies.nfv.AntiAffinityRule
+        targets: [ cf2_aa_group ]
+        properties:
+          scope: 'nfvi_node'
+
+    - policy_antiaffinity_2:
+        type: tosca.policies.nfv.AntiAffinityRule
+        targets: [ sf3_aa_group ]
+        properties:
+          scope: 'nfvi_node'
+
+    - VIM_NETWORK_ORCH_SEC_GRP_0:
+        type: cisco.policies.nfv.SecurityGroupRule
+        group_name: { get_input: VIM_NETWORK_ORCH_SEC_GRP_0 }
+        targets: [ c1_nic1 ]
+
+    - VIM_NETWORK_ORCH_SEC_GRP_1:
+        type: cisco.policies.nfv.SecurityGroupRule
+        group_name: { get_input: VIM_NETWORK_ORCH_SEC_GRP_1 }
+        targets: [ c1_nic1 ]
+
+#######################
+# Group configuration #
+#######################
+  groups:
+    cf2_aa_group:
+      type: tosca.groups.nfv.PlacementGroup
+      members: [ c1, c2 ]
+
+    sf3_aa_group:
+      type: tosca.groups.nfv.PlacementGroup
+      members: [ c1, c2, s3, s3, s4, s5, s6 ]
