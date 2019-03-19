@@ -164,10 +164,10 @@ topology_template:
             metric_value: 1
             metric_cond: 'GT'
             metric_type: 'UINT32'
-            metric_occurences_true: 1
-            metric_occurences_false: 30
+            metric_occurrences_true: 1
+            metric_occurrences_false: 30
             metric_collector:
-              metric_type: 'ICMPPing'
+              type: 'ICMPPing'
               nicid: 0
               address_id: 0
               poll_frequency: 10
@@ -221,7 +221,8 @@ topology_template:
       artifacts:
         sw_image:
           type: tosca.artifacts.nfv.SwImage
-          file: ../Files/Images/vDU-2.0-402-27Dec2017.qcow2
+          file: http://engci-maven-master.cisco.com/artifactory/nso-snapshot/NFVO-SOL003-VNF-Images-0.0.3/Altiostar_VDU/vDU-2.0-402-27Dec2017.qcow2
+
 
 ######################################
 # Connection points for "vdu_node_1" #
