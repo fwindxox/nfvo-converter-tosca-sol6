@@ -4,7 +4,7 @@ root=../../..
 export PYTHONPATH=$root/python/nfvo_solcon_tosca
 
 # Run all files in $example_root
-output_root=$root/outputs/nokia
+output_root=$root/outputs/cbam
 
 for filename in $output_root/*.json; do
     file=$(basename $filename)
