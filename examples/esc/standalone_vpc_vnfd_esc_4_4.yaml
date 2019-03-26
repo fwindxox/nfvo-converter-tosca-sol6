@@ -1114,7 +1114,7 @@ topology_template:
     - VIM_NETWORK_ORCH_SEC_GRP_0:
         type: cisco.policies.nfv.SecurityGroupRule
         group_name: { get_input: VIM_NETWORK_ORCH_SEC_GRP_0 }
-        targets: [ c1_nic1 ]
+        targets: [ c1_nic1, c2_nic1 ]
 
     - VIM_NETWORK_ORCH_SEC_GRP_1:
         type: cisco.policies.nfv.SecurityGroupRule
