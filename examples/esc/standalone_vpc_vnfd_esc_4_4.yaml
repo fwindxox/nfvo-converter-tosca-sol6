@@ -1034,8 +1034,6 @@ topology_template:
               name: 'control-function'
               description: 'Controller tasks, Local context VPNMGR, System boot image and configuration storage on vHDD, etc.'
               max_scale_level: 0
-              step_deltas:
-                - delta_2
 
     - instantiation_levels:
         type: tosca.policies.nfv.InstantiationLevels
@@ -1086,15 +1084,6 @@ topology_template:
             delta_1:
               number_of_instances: 1
         targets: [ s3, s4 ]
-
-    - cf_scaling_aspect_deltas:
-        type: tosca.policies.nfv.VduScalingAspectDeltas
-        properties:
-          aspect: control-function
-          deltas:
-            delta_2:
-              number_of_instances: 1
-        targets: [ c1, c2 ]
 
     - sf_instantiation_levels:
         type: tosca.policies.nfv.VduInstantiationLevels
