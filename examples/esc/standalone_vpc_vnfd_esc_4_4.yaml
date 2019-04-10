@@ -1106,7 +1106,7 @@ topology_template:
           scope: 'nfvi_node'
 
     - policy_antiaffinity_3:
-        type: tosca.policies.nfv.AntiAffinityRule
+        type: tosca.policies.nfv.AffinityRule
         targets: [ sf4_aa_group ]
         properties:
           scope: 'nfvi_node'
