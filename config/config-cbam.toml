@@ -1,5 +1,5 @@
 
-# These must match with 'provider-identifiers.{}'
+# These must match with 'provider-identifiers{SPLIT_CHAR}{}'
 # If the given provider for a VNFD matches with one of these, then it will automatically
 # take the identifiers from this file
 providers=["nokia"]
@@ -38,7 +38,8 @@ providers=["nokia"]
 
     virtual_compute             = ["node_templates", "{}"]
     virtual_compute_prop        = ["virtual_compute", "properties"]
-    virtual_compute_mem_size    = ["virtual_compute_prop", "virtual_memory.virtual_mem_size"]
+    virtual_compute_mem         = ["virtual_compute_prop", "virtual_memory"]
+    virtual_compute_mem_size    = ["virtual_compute_mem", "virtual_mem_size"]
     virtual_compute_virt_cpu    = ["virtual_compute_prop", "virtual_cpu"]
     virtual_compute_cpu_num     = ["virtual_compute_virt_cpu", "num_virtual_cpu"]
     virtual_compute_cpu_arch    = ["virtual_compute_virt_cpu", "cpu_architecture"]
@@ -91,7 +92,8 @@ providers=["nokia"]
 
     int_cpd                     = ["node_templates", "{}"]
     # This path must exist for an ICP to be created inside a VDU
-    int_cpd_cond                = "requirements.virtual_binding"
+    # The {} means the SPLIT_CHAR
+    int_cpd_cond                = "requirements{}virtual_binding"
     int_cpd_req                 = ["int_cpd", "requirements"]
     int_cpd_binding             = ["int_cpd_req", "virtual_binding"]
     int_cpd_link                = ["int_cpd_req", "virtual_link"]
