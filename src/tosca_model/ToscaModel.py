@@ -1,5 +1,6 @@
 from tosca_model import *
 
+
 class ToscaModel:
 
     def __init__(self):
@@ -20,5 +21,3 @@ class ToscaModel:
             if t not in config:
                 continue
             self.types[t] = config[t]
-
-
