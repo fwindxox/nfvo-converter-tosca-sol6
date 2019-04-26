@@ -1,10 +1,10 @@
-from tosca_model import ToscaModel
+from tosca_model import ToscaElement
 
 
-class VNF(ToscaModel):
-    def __init__(self):
-        super()
-        self.type = "cisco.1VDU.1_0.1_0"
+class VNF(ToscaElement):
+    def __init__(self, elem_type):
+        super().__init__(elem_type)
+
         self.id = None
         self.version = None
         self.provider = None
