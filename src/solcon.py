@@ -4,7 +4,7 @@
 """
 __author__ = "Aaron Steele"
 __credits__ = ["Frederick Jansson"]
-__version__ = "0.5"
+__version__ = "1.0"
 
 import argparse
 import json
@@ -12,11 +12,6 @@ import yaml
 import logging
 import sys
 import os.path
-import dict_utils
-from sol6_converter import Sol6Converter
-from sol6_converter_nokia import SOL6ConverterNokia
-from sol6_converter_cisco import SOL6ConverterCisco
-import toml
 log = logging.getLogger(__name__)
 
 

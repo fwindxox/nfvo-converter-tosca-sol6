@@ -1,0 +1,4 @@
+
+
+class VNF(ToscaModel):
+    pass
