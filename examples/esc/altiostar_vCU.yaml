@@ -70,9 +70,9 @@ node_types:
     artifacts:
 
 topology_template:
-###################
-# Template Inputs #
-###################
+  ###################
+  # Template Inputs #
+  ###################
   inputs:
 
     BOOTUP_TIME:
@@ -86,22 +86,22 @@ topology_template:
     VIM_FLAVOR:
       description: Flavour name
       type: string
-########################
-# Substitution Mapping #
-########################
+  ########################
+  # Substitution Mapping #
+  ########################
   substitution_mappings:
     node_type: cisco.1VDU.1_0.1_0
     requirements:
       - virtual_link: [ node_1_nic0, virtual_link ]
 
-##########
-# Nodes: #
-##########
+  ##########
+  # Nodes: #
+  ##########
   node_templates:
 
-#####################
-# VNF configuration #
-#####################
+    #####################
+    # VNF configuration #
+    #####################
     vnf:
       type: cisco.1VDU.1_0.1_0
       properties:
@@ -131,14 +131,14 @@ topology_template:
                 VIM_FLAVOR: { get_input: VIM_FLAVOR }
                 BOOTUP_TIME: { get_input: BOOTUP_TIME }
           instantiate_end:
-            #implementation: { get_artifact: [SELF, POST_DEPLOY] }
+          #implementation: { get_artifact: [SELF, POST_DEPLOY] }
           operate:
           heal:
       artifacts:
 
-#####################
-# VDU configuration #
-#####################
+    #####################
+    # VDU configuration #
+    #####################
     vdu_node_1:
       type: cisco.nodes.nfv.Vdu.Compute
       properties:
@@ -192,9 +192,9 @@ topology_template:
         - virtual_storage: vBBU1_vol
 
 
-#########################
-# Virtual Block Storage #
-#########################
+    #########################
+    # Virtual Block Storage #
+    #########################
     vBBU1_vol:
       type: cisco.nodes.nfv.Vdu.VirtualBlockStorage
       properties:
@@ -219,9 +219,9 @@ topology_template:
           type: tosca.artifacts.nfv.SwImage
           file: ../Files/Images/altiostar/vBBU
 
-######################################
-# Connection points for "vdu_node_1" #
-######################################
+    ######################################
+    # Connection points for "vdu_node_1" #
+    ######################################
     node_1_nic0:
       type: cisco.nodes.nfv.VduCp
       properties:
@@ -277,9 +277,9 @@ topology_template:
         - virtual_link: altiostar-mgmt
         - virtual_binding: vdu_node_1
 
-########################################
-# Internal Virtual Links configuration #
-########################################
+    ########################################
+    # Internal Virtual Links configuration #
+    ########################################
     front-haul:
       type: tosca.nodes.nfv.VnfVirtualLink
       properties:
@@ -315,9 +315,9 @@ topology_template:
             root: 100000
           min_bitrate_requirements:
             root: 0
-########################
-# Policy configuration #
-########################
+  ########################
+  # Policy configuration #
+  ########################
   policies:
     - scaling_aspects:
         type: tosca.policies.nfv.ScalingAspects
@@ -340,9 +340,9 @@ topology_template:
                   scale_level: 0
           default_level: default
 
-  ######
-  # VM #
-  ######
+    ######
+    # VM #
+    ######
     - vm_initial_delta:
         type: tosca.policies.nfv.VduInitialDelta
         properties:
