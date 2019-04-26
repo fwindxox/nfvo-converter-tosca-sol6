@@ -1,0 +1,3 @@
+
+TOSCA_TYPES:
+  VNF: "cisco.1VDU.1_0.1_0"
