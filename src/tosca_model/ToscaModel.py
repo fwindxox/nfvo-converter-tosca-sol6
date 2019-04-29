@@ -21,3 +21,21 @@ class ToscaModel:
             if t not in config:
                 continue
             self.types[t] = config[t]
+
+    def get_all_elements(self):
+        """
+        Get a flat list of all the ToscaElement objects contained in the model
+        """
+        res = [self.VNF]
+        for vdu in self.VDU:
+            res.append(vdu)
+
+        return res
+
+    def __str__(self):
+        res = "VNF\n\t{}\n".format(self.VNF)
+        vdus = ""
+        for vdu in self.VDU:
+            vdus += "VDU\n\t{}".format(str(vdu))
+        res += vdus
+        return res

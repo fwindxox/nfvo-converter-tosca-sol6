@@ -27,7 +27,9 @@ class BuildModelTosca:
         self.tosca_model.set_types_from_config(self.config["TOSCA_TYPES"])
         self.partition_raw_input()
         self.init_elements()
+        self.process_input()
 
+        print(self.tosca_model)
         # Start getting values from the input file
 
     def partition_raw_input(self):
@@ -40,7 +42,7 @@ class BuildModelTosca:
 
     def init_elements(self):
         """
-        Initialize all the base elements with empty objects other than their types
+        Initialize all the base elements with empty (other than their types) objects
         """
 
         self.tosca_model.VNF = VNF(self.tosca_model.types["VNF"])
@@ -48,6 +50,17 @@ class BuildModelTosca:
         # Create as many VDU objects as there are instances in the input array
         for i in range(len(self.raw_type_input["VDU"])):
             self.tosca_model.VDU.append(VDU(self.tosca_model.types["VDU"]))
+
+    def process_input(self):
+        for elem in self.tosca_model.get_all_elements():
+            cur_type_input = self.raw_type_input[elem.elem_name]
+
+            if isinstance(cur_type_input, list) and len(cur_type_input) == 1:
+                cur_type_input = cur_type_input[0]
+            else:
+                raise TypeError("An unexpected list was found")
+
+            elem.read_data_from_input(cur_type_input)
 
     @staticmethod
     def _read(file):
