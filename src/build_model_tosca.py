@@ -37,8 +37,56 @@ class BuildModelTosca:
         Get the raw data and assign it to self.raw_type_input under it's own dict entry list
         """
         for t in list(self.tosca_model.types.keys()):
-            self.raw_type_input[t] = list(dict_utils.get_roots_from_filter(self.input, child_key="type",
+            # Get all of the roots that have the type as a value
+            self.raw_type_input[t] = list(dict_utils.get_roots_from_filter(self.input,
                                                                            child_value=self.tosca_model.types[t]))
+            cur_input = self.raw_type_input[t]
+            # We can't do just 'type': value because substitution mappings can have information in it that we
+            # expect to be in node_templates
+            if len(cur_input) == 1:
+                continue
+            # We have a list that has multiple elements
+            # This can be a normal thing (for VDUs) or it can be something we need to handle
+            # We want to merge the dict entries iff one of the elements has 'substitution_mapping' for the key
+            for i, e in enumerate(cur_input):
+                if "substitution_mappings" not in list(e.keys()):
+                    continue
+                # We have a substitution mapping we need to merge
+                # Make sure we have somewhere to put the merged info
+                # We want to put the the data into something that has "type":type
+                self._partition_merge_substitution(dict(e), cur_input, t)
+
+    def _partition_merge_substitution(self, e, cur_input, type_key):
+        """
+        We have found the element that has the data we need to merge into a singular other, non-same, element contianed
+        inside cur_input that has "type":current_type
+        """
+        for i, elem in enumerate(cur_input):
+            if e is elem:
+                continue
+            merge_target = dict_utils.get_roots_from_filter(elem, child_key="type",
+                                                            child_value=self.tosca_model.types[type_key])
+            if not merge_target:
+                continue
+            # The merge target should be valid, so let's merge the data
+            # If there are multiple valid merge locations, then I have no idea what's going on, just pick the first one
+            if len(merge_target) > 1:
+                logger.warning("There are multiple merge targets for substitution_mappings type merging, and this isn't"
+                               "handled.")
+            if isinstance(merge_target, list):
+                merge_target = merge_target[0]
+            # Strip the top level from the target and e, snce we need to merge into the internals
+            elem_key = dict_utils.get_dict_key(elem)
+            merge_target_key = dict_utils.get_dict_key(merge_target)
+
+            merge_target = merge_target[merge_target_key]
+            strip_e = e[dict_utils.get_dict_key(e)]
+
+            print(elem_key, merge_target_key)
+            cur_input[i][elem_key] = dict_utils.merge_two_dicts(merge_target, strip_e)
+
+        # Once we have merged all applicable instances into the VNFs, remove the substitution_mapping element
+        cur_input.remove(e)
 
     def init_elements(self):
         """

@@ -184,7 +184,8 @@ def get_roots_from_filter(cur_dict, child_key=None, child_value=None, parent_key
             try:
                 # We'll hit a type error when trying to iterate over non-iterables
                 # Just ignore it if that's the case
-                if child_value == value or child_value in value:
+                # Using 'in' will also check for dict keys, which in this case we do not want
+                if child_value == value or (not isinstance(value, dict) and child_value in value):
                     if not child_key:
                         if parent_key:
                             return {parent_key: cur_dict}

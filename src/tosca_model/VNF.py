@@ -50,6 +50,7 @@ class VNF(ToscaElement):
         self.flavour_id                     = val(VNFPaths.flavour_id)
         self.flavour_description            = val(VNFPaths.flavour_description)
         self.vnf_profile                    = val(VNFPaths.vnf_profile)
+        self.virtual_link                   = val(VNFPaths.virtual_link)
 
     def __str__(self):
         # Just do a stupid loop through and get all the variables
@@ -64,9 +65,7 @@ class VNFPaths:
     fmt = formatter.fmt_last
     set_root = formatter.set_root
 
-    properties                      = "properties"
-    set_root(properties)
-
+    set_root("properties")
     # Name                          = Path                                      Req     No message on missing
     descriptor_id                   = fmt("descriptor_id"),                     True
     descriptor_version              = fmt("descriptor_version"),                True
@@ -85,3 +84,6 @@ class VNFPaths:
     flavour_id                      = fmt("flavour_id"),                        True
     flavour_description             = fmt("flavour_description"),               True
     vnf_profile                     = fmt("vnf_profile"),                       False,  False
+
+    set_root("requirements")
+    virtual_link                    = fmt("virtual_link"),                      True
