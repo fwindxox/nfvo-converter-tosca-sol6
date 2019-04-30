@@ -23,6 +23,7 @@ class VNF(ToscaElement):
         self.flavour_id                     = None
         self.flavour_description            = None
         self.vnf_profile                    = None
+        self.virtual_link                   = None
 
         self.all_vars = list(vars(self).keys())
 

@@ -21,6 +21,15 @@ class BuildModelTosca:
         self.input = self._read(self.input_file)
         self.config = self._read(self.config_file)
 
+        # Try to figure out what the VNF type is automatically
+        if "VNF" not in self.config["TOSCA_TYPES"]:
+            # The 'vnf' type isn't required by tosca, so just try to do this
+            try:
+                self.config["TOSCA_TYPES"]["VNF"] = self.input["topology_template"]["node_templates"]["vnf"]["type"]
+            except KeyError:
+                # If we do get here then we can't continue because we require the VNF type
+                raise ValueError("No type for 'VNF' found in config file")
+
         # Initialize the model where we're going to store everything
         self.tosca_model = ToscaModel()
         # Tell the model what the types of the varying elements are
