@@ -19,10 +19,11 @@ class VDU(ToscaElement):
 
         # Easy first step, just associate the vdu_id to the given element in the list
         self.assoc_data = input_data[self.elem_name][self.vdu_id]
-        print(self.assoc_data)
 
         # The compute element is the *actual* node that will have the structure in it
         self.compute.read_data_from_input(self.assoc_data)
+
+        self._init_subelems(input_data)
 
     def _init_subelems(self, input_data):
         # Ensure our composite elements exst
@@ -33,13 +34,3 @@ class VDU(ToscaElement):
 
     def __str__(self):
         return super().__str__()
-
-
-class VNFPaths:
-    formatter = PathFormatter()
-    fmt = formatter.fmt_last
-    set_root = formatter.set_root
-
-    set_root("properties")
-    # Name                          = Path                                      Req     No message on missing
-    descriptor_id                   = fmt("descriptor_id"),                     True
