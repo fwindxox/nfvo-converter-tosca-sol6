@@ -28,6 +28,11 @@ class VNF(ToscaElement):
         self.all_vars = list(vars(self).keys())
 
     def read_data_from_input(self, input_data):
+        input_data = input_data[self.elem_name]
+
+        # Most of the input_data comes in as a list, but as a VNF we only care about one element
+        if isinstance(input_data, list):
+            input_data = input_data[0]
         # Strip the top element, because it's not super important
         input_stripped = input_data[get_dict_key(input_data)]
         # Make this shorter

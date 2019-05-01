@@ -7,7 +7,10 @@ class ToscaModel:
         # Initialize names of types here
         self.types = {
             "VNF": None,
-            "VDU": None
+            "VDU": None,
+            "VDU_COMPUTE": None,
+            "VDU_STORAGE": None,
+            "VDU_CONNECTION_POINT": None
         }
 
         # Initialize the blank fields for parts
@@ -28,6 +31,8 @@ class ToscaModel:
         """
         res = [self.VNF]
         for vdu in self.VDU:
+            # Add the VDU, which probably won't have much information in it
+            # and the VDU elements, which should have the information
             res.append(vdu)
 
         return res

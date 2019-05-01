@@ -1,7 +1,7 @@
-from tosca_model import *
+from tosca_model import ToscaElement
 
 
-class VDU(ToscaElement):
+class ConnectionPoint(ToscaElement):
     def __init__(self, elem_type):
         super().__init__(elem_type, type(self).__name__)
 

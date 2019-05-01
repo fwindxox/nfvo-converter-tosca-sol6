@@ -2,6 +2,7 @@ from tosca_model import *
 import yaml
 import logging
 from tools import dict_utils
+
 logger = logging.getLogger(__name__)
 
 
@@ -91,7 +92,6 @@ class BuildModelTosca:
             merge_target = merge_target[merge_target_key]
             strip_e = e[dict_utils.get_dict_key(e)]
 
-            print(elem_key, merge_target_key)
             cur_input[i][elem_key] = dict_utils.merge_two_dicts(merge_target, strip_e)
 
         # Once we have merged all applicable instances into the VNFs, remove the substitution_mapping element
@@ -105,19 +105,22 @@ class BuildModelTosca:
         self.tosca_model.VNF = VNF(self.tosca_model.types["VNF"])
         # Figure out how many of each element array we need
         # Create as many VDU objects as there are instances in the input array
-        for i in range(len(self.raw_type_input["VDU"])):
-            self.tosca_model.VDU.append(VDU(self.tosca_model.types["VDU"]))
+        # Base this on the vdu compute nodes, since those are the "main" objects
+        for i in range(len(self.raw_type_input["VDU_COMPUTE"])):
+            cur_vdu = VDU(self.tosca_model.types["VDU"], i)
+
+            cur_vdu.compute = Compute(self.tosca_model.types["VDU_COMPUTE"])
+            cur_vdu.storage = Storage(self.tosca_model.types["VDU_STORAGE"])
+            self.tosca_model.VDU.append(cur_vdu)
 
     def process_input(self):
         for elem in self.tosca_model.get_all_elements():
-            cur_type_input = self.raw_type_input[elem.elem_name]
+            if not elem:
+                continue
 
-            if isinstance(cur_type_input, list) and len(cur_type_input) == 1:
-                cur_type_input = cur_type_input[0]
-            else:
-                raise TypeError("An unexpected list was found")
-
-            elem.read_data_from_input(cur_type_input)
+            # Call the process method inherited from ToscaElement
+            # Pass in the whole data because we can easily need the whole thing
+            elem.read_data_from_input(self.raw_type_input)
 
     @staticmethod
     def _read(file):
