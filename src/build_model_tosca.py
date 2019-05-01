@@ -39,7 +39,7 @@ class BuildModelTosca:
         self.init_elements()
         self.process_input()
 
-        print(self.tosca_model)
+        # print(self.tosca_model)
         # Start getting values from the input file
 
     def partition_raw_input(self):
@@ -109,8 +109,8 @@ class BuildModelTosca:
         for i in range(len(self.raw_type_input["VDU_COMPUTE"])):
             cur_vdu = VDU(self.tosca_model.types["VDU"], i)
 
-            cur_vdu.compute = Compute(self.tosca_model.types["VDU_COMPUTE"])
-            cur_vdu.storage = Storage(self.tosca_model.types["VDU_STORAGE"])
+            cur_vdu.compute = Compute(self.tosca_model.types["VDU_COMPUTE"], parent_elem=cur_vdu)
+            cur_vdu.storage = Storage(self.tosca_model.types["VDU_STORAGE"], parent_elem=cur_vdu)
             self.tosca_model.VDU.append(cur_vdu)
 
     def process_input(self):

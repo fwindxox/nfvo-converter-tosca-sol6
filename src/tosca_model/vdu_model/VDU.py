@@ -3,8 +3,8 @@ from tools import PathFormatter
 
 
 class VDU(ToscaElement):
-    def __init__(self, elem_type, vdu_id):
-        super().__init__(elem_type, type(self).__name__)
+    def __init__(self, elem_type, vdu_id, parent_elem=None):
+        super().__init__(elem_type, "VDU_COMPUTE", parent_elem=parent_elem)
         self.vdu_id = vdu_id
         self.compute = None
         self.storage = None
@@ -17,9 +17,15 @@ class VDU(ToscaElement):
         # So we need to determine unambiguously what compute element is ours, and determine connectivity here before
         # we pass the data down to the components
 
+        # Easy first step, just associate the vdu_id to the given element in the list
+        self.assoc_data = input_data[self.elem_name][self.vdu_id]
+        print(self.assoc_data)
+
+        # The compute element is the *actual* node that will have the structure in it
+        self.compute.read_data_from_input(self.assoc_data)
+
+    def _init_subelems(self, input_data):
         # Ensure our composite elements exst
-        if self.compute and self.compute.elem_name in input_data:
-            self.compute.read_data_from_input(input_data[self.compute.elem_name])
         if self.storage and self.storage.elem_name in input_data:
             self.storage.read_data_from_input(input_data[self.storage.elem_name])
         if self.connection_point and self.connection_point.elem_name in input_data:

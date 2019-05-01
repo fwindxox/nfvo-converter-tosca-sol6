@@ -2,9 +2,13 @@ from abc import abstractmethod
 
 
 class ToscaElement:
-    def __init__(self, elem_type, class_name):
+    def __init__(self, elem_type, class_name, parent_elem=None):
         self.elem_type = elem_type
         self.elem_name = class_name
+        self.assoc_data = None
+        # We want to be able to access the full model from inside any part, so structuring it
+        # as a tree makes sense, especially since we deal with locations in a very relational way
+        self.parent_elem = parent_elem
 
     @abstractmethod
     def read_data_from_input(self, input_data):
