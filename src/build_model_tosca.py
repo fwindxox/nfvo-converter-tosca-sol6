@@ -103,14 +103,17 @@ class BuildModelTosca:
         """
 
         self.tosca_model.VNF = VNF(self.tosca_model.types["VNF"])
+        self.tosca_model.VNF.suppress_notfound = True
         # Figure out how many of each element array we need
         # Create as many VDU objects as there are instances in the input array
         # Base this on the vdu compute nodes, since those are the "main" objects
         for i in range(len(self.raw_type_input["VDU_COMPUTE"])):
-            cur_vdu = VDU(self.tosca_model.types["VDU"], i)
+            cur_vdu = VDU(self.tosca_model.types["VDU"], i, parent_elem=self.tosca_model.VNF)
 
             cur_vdu.compute = Compute(self.tosca_model.types["VDU_COMPUTE"], parent_elem=cur_vdu)
-            cur_vdu.storage = Storage(self.tosca_model.types["VDU_STORAGE"], parent_elem=cur_vdu)
+            cur_vdu.compute.suppress_notfound = True
+            cur_vdu.storage.append(Storage(self.tosca_model.types["VDU_STORAGE"], parent_elem=cur_vdu))
+            cur_vdu.storage[-1].suppress_notfound = True
             self.tosca_model.VDU.append(cur_vdu)
 
     def process_input(self):

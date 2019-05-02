@@ -17,21 +17,35 @@ class Compute(ToscaElement):
         self.virtual_storage                = None
         self.virtual_compute                = None
         self.virtual_binding                = None
+        self.all_vars = list(vars(self).keys())
 
     def read_data_from_input(self, input_data):
-        print("Compute read")
         # Strip the top element, because it's not super important
-        input_stripped = input_data[get_dict_key(input_data)]
+        self.dict_name = get_dict_key(input_data)
+        input_stripped = input_data[self.dict_name]
         # Make this shorter
         val = lambda x: get_path_value(PathFormatter.path(x), input_stripped, must_exist=PathFormatter.req(x),
-                                       no_msg=PathFormatter.no_msg(x))
+                                       no_msg=PathFormatter.no_msg(x) or self.suppress_notfound)
 
         self.name                           = val(VNFPaths.name)
-
-        print(self.name)
+        self.description                    = val(VNFPaths.description)
+        self.boot_order                     = val(VNFPaths.boot_order)
+        self.nfvi_constraints               = val(VNFPaths.nfvi_constraints)
+        self.monitoring_parameters          = val(VNFPaths.monitoring_parameters)
+        self.configurable_properties        = val(VNFPaths.configurable_properties)
+        self.boot_data                      = val(VNFPaths.boot_data)
+        self.vdu_profile                    = val(VNFPaths.vdu_profile)
+        self.sw_image_data                  = val(VNFPaths.sw_image_data)
+        self.virtual_storage                = val(VNFPaths.virtual_storage)
+        self.virtual_compute                = val(VNFPaths.virtual_compute)
+        self.virtual_binding                = val(VNFPaths.virtual_binding)
 
     def __str__(self):
-        return super().__str__()
+        # Just do a stupid loop through and get all the variables
+        res = super().__str__()
+        for var in self.all_vars:
+            res = "{}, {}: {}".format(res, var, self.__dict__[var])
+        return res
 
 
 class VNFPaths:

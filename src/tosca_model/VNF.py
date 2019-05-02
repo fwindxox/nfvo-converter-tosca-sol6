@@ -34,10 +34,11 @@ class VNF(ToscaElement):
         if isinstance(input_data, list):
             input_data = input_data[0]
         # Strip the top element, because it's not super important
-        input_stripped = input_data[get_dict_key(input_data)]
+        self.dict_name = get_dict_key(input_data)
+        input_stripped = input_data[self.dict_name]
         # Make this shorter
         val = lambda x: get_path_value(PathFormatter.path(x), input_stripped, must_exist=PathFormatter.req(x),
-                                       no_msg=PathFormatter.no_msg(x))
+                                       no_msg=PathFormatter.no_msg(x) or self.suppress_notfound)
 
         self.descriptor_id                  = val(VNFPaths.descriptor_id)
         self.descriptor_version             = val(VNFPaths.descriptor_version)

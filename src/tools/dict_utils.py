@@ -54,10 +54,10 @@ def get_path_value(path, cur_dict, must_exist=True, ensure_dict=False, no_msg=Fa
 
 def _path_val_existant(must_exist, no_msg, val, path):
     if must_exist:
-        raise KeyError("Path '{}' not found in {}".format(val, path))
+        raise KeyError("Path '{}' not found in '{}'".format(val, path))
     else:
         if not no_msg:
-            log.warning("{} not found in {}".format(val, path))
+            log.info("'{}' not found in '{}'".format(val, path))
         return False
 
 
