@@ -1,0 +1,38 @@
+
+TOSCA_TYPES:
+  VNF: "tosca.nodes.nfv.VNF"
+  VDU_COMPUTE: "cisco.nodes.nfv.Vdu.Compute"
+  VDU_STORAGE: "cisco.nodes.nfv.Vdu.VirtualBlockStorage"
+
+
+  #  -- From TOSCA Specs --
+  #  VNFD
+  #    tosca.nodes.nfv.VNF
+  #  Vdu
+  #    n/a
+  #  Cpd (Connection Point)
+  #    tosca.nodes.nfv.Cp
+  #  VduCpd
+  #    tosca.nodes.nfv.VduCp tosca.nodes.nfv.Cp
+  #  VnfVirtualLinkDesc
+  #    tosca.nodes.nfv.VnfVirtualLink
+  #  VnfExtCpd
+  #    tosca.nodes.nfv.VnfExtCp
+  #    tosca.nodes.nfv.VduCp
+  #  VirtualStorageDesc
+  #    tosca.nodes.nfv.Vdu.VirtualBlockStorage
+  #    tosca.nodes.nfv.Vdu.VirtualObjectStorage
+  #    tosca.nodes.nfv.Vdu.VirtualFileStorage
+  #  VirtualComputeDesc
+  #    tosca.nodes.nfv.Vdu.Compute
+  #  SwImageDesc
+  #    tosca.artifacts.nfv.SwImage
+  #  VnfDf
+  #    n/a (see note 2) n/a
+  #  SecurityGroupRule
+  #    tosca.policies.nfv.SecurityGroupRule
+  #  VnfConfigurableProperties
+  #    tosca.datatypes.nfv.VnfConfigurableProperties
+  #  VnfInfoModifiableAttributes
+  #    tosca.datatypes.nfv.VnfInfoModifiableAttributes
+

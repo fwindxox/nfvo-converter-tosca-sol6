@@ -8,7 +8,7 @@ __version__ = "1.0"
 
 import argparse
 from build_model_tosca import *
-import os.path
+from sol6_writer.Sol6Writer import Sol6Writer
 import logging
 logger = logging.getLogger(__name__)
 
@@ -42,8 +42,8 @@ class SolCon:
         model_builder_tosca.build()
 
         model = model_builder_tosca.tosca_model
-
-            #print("({}) {}: {}".format(vdu.vdu_id, vdu.compute.name, vdu.storage.dict_name))
+        writer = Sol6Writer(model)
+        writer.write("test.xml")
 
 
 def setup_logger(log_level=logging.INFO):
