@@ -42,8 +42,8 @@ class SolCon:
         model_builder_tosca.build()
 
         model = model_builder_tosca.tosca_model
-        #for vdu in model.VDU:
-        #    print("({}) {}: {}".format(vdu.vdu_id, vdu.compute.name, vdu.storage.dict_name))
+
+            #print("({}) {}: {}".format(vdu.vdu_id, vdu.compute.name, vdu.storage.dict_name))
 
 
 def setup_logger(log_level=logging.INFO):

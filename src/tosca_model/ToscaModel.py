@@ -38,9 +38,9 @@ class ToscaModel:
         return res
 
     def __str__(self):
-        res = "VNF\n\t{}\n".format(self.VNF)
+        res = "VNF\n\t{}\nVDUs\n".format(self.VNF)
         vdus = ""
         for vdu in self.VDU:
-            vdus += "VDU\n\t{}".format(str(vdu))
+            vdus += "\t{}\n".format(str(vdu))
         res += vdus
         return res

@@ -39,7 +39,7 @@ class BuildModelTosca:
         self.init_elements()
         self.process_input()
 
-        # print(self.tosca_model)
+        print(self.tosca_model)
         # Start getting values from the input file
 
     def partition_raw_input(self):

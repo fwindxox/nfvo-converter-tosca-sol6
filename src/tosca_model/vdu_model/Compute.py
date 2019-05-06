@@ -2,6 +2,7 @@ from tosca_model import ToscaElement
 from tools import PathFormatter
 from tools.dict_utils import *
 
+
 class Compute(ToscaElement):
     def __init__(self, elem_type, parent_elem=None):
         super().__init__(elem_type, "VDU_COMPUTE", parent_elem=parent_elem)
@@ -42,8 +43,11 @@ class Compute(ToscaElement):
 
     def __str__(self):
         # Just do a stupid loop through and get all the variables
-        res = super().__str__()
+        res = self.elem_name
         for var in self.all_vars:
+            # Prevent infinite recursion
+            if var is "parent_elem":
+                continue
             res = "{}, {}: {}".format(res, var, self.__dict__[var])
         return res
 
