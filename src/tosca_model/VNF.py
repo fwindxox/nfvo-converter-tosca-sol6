@@ -1,4 +1,4 @@
-from tosca_model import ToscaElement
+from tosca_model import *
 from tools import *
 
 

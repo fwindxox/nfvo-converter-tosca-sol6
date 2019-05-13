@@ -43,7 +43,8 @@ class SolCon:
 
         model = model_builder_tosca.tosca_model
         writer = Sol6Writer(model)
-        writer.write("test.xml")
+        # TODO: Make this use absolute paths
+        writer.write(output)
 
 
 def setup_logger(log_level=logging.INFO):
