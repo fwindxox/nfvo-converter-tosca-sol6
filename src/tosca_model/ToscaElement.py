@@ -17,6 +17,10 @@ class ToscaElement:
     def read_data_from_input(self, input_data):
         pass
 
+    def to_tree_structure(self, parent, name):
+        """ For overriding """
+        pass
+
     def __str__(self):
         return "{}, {}".format(self.elem_name, self.elem_type)
 
