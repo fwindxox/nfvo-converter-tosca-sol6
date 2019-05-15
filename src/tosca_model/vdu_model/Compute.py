@@ -21,7 +21,8 @@ class Compute(ToscaElement):
         self.all_vars = list(vars(self).keys())
 
     def read_data_from_input(self, input_data):
-        # Strip the top element, because it's not super important
+        # Strip the top element, because we need to get to the data beneath it
+        # Save it because it's the id
         self.dict_name = get_dict_key(input_data)
         input_stripped = input_data[self.dict_name]
         # Make this shorter
