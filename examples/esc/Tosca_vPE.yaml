@@ -1,0 +1,373 @@
+tosca_definitions_version: tosca_simple_yaml_1_2
+description: VNFD YAML Generated from deployment wizard tool
+
+
+imports:
+  - cisco_nfv_sol001_types.yaml
+  - etsi_nfv_sol001_vnfd_0_10_0_types.yaml
+
+metadata:
+  template_name: 1VDU-Cisco-wizard
+  template_author: Cisco Systems
+  template_version: 1.0
+
+dsl_definitions:
+  descriptor_id: &descriptor_id 89a2b1f7-dc08-468c-b351-6da0281b02f5
+  provider: &provider cisco
+  product_name: &product_name 1VDU-Cisco-wizard
+  product_info_name: &product_info_name ''
+  product_info_description: &product_info_description ''
+  software_version: &software_version '1.0'
+  descriptor_version: &descriptor_version '24.0'
+  flavour_id: &flavour_id default
+  flavour_description: &flavour_description 'Default VNF Deployment Flavour'
+  vnfm: &vnfm '9:Cisco Elastic Services Controller:vX.Y'
+
+node_types:
+  cisco.VDU.custom:
+    derived_from: tosca.nodes.nfv.VNF
+    properties:
+      descriptor_id:
+        type: string
+        constraints: [ valid_values: [ *descriptor_id ] ]
+        default: *descriptor_id
+      provider:
+        type: string
+        constraints: [ valid_values: [ *provider ] ]
+        default: *provider
+      product_name:
+        type: string
+        constraints: [ valid_values: [ *product_name ] ]
+        default: *product_name
+      software_version:
+        type: string
+        constraints: [ valid_values: [ *software_version ] ]
+        default: *software_version
+      descriptor_version:
+        type: string
+        constraints: [ valid_values: [ *descriptor_version ] ]
+        default: *descriptor_version
+      product_info_name:
+        type: string
+        constraints: [ valid_values: [ *product_info_name ] ]
+        default: *product_info_name
+      product_info_description:
+        type: string
+        constraints: [ valid_values: [ *product_info_description ] ]
+        default: *product_info_description
+      flavour_id:
+        type: string
+        constraints: [ valid_values: [ *flavour_id ] ]
+        default: *flavour_id
+      flavour_description:
+        type: string
+        constraints: [ valid_values: [ *flavour_description ] ]
+        default: *flavour_description
+      vnfm_info:
+        type: list
+        entry_schema:
+          type: string
+        constraints: [ valid_values: [ [ *vnfm ] ] ]
+        default: [ *vnfm ]
+      configurable_properties:
+        type: tosca.datatypes.nfv.VnfConfigurableProperties
+        description: Describes the configurable properties of the VNF
+        required: false
+      lcm_operations_configuration:
+        type: cisco.datatypes.nfv.VnfLcmOperationsConfiguration
+        required: false
+    interfaces:
+      Vnflcm:
+        type: cisco.interfaces.nfv.Vnflcm
+    artifacts:
+
+topology_template:
+##################################################
+# Substitution Mappings                          #
+##################################################
+  substitution_mappings:
+    node_type: cisco.VDU.custom
+    requirements:
+      - virtual_link: [ vPE_nic0, virtual_link ]
+##################################################
+# Nodes                                          #
+##################################################
+  node_templates:
+    vnf:
+      type: cisco.VDU.custom
+      properties:
+        descriptor_id: 89a2b1f7-dc08-468c-b351-6da0281b02f5
+        descriptor_version: 24.0
+        provider: Cisco
+        product_name: XRV9k (Sunstone)
+        software_version: 1.0
+        product_info_name:
+        vnfm_info:
+          - '9:Cisco Elastic Services Controller:vX.Y'
+        configurable_properties:
+          is_autoscale_enabled: false
+          is_autoheal_enabled: false
+        lcm_operations_configuration:
+          heal:
+            recovery_action: REBOOT_THEN_REDEPLOY
+            recovery_wait_time: 600
+        flavour_id: default
+        flavour_description: 'Default VNF Deployment Flavour'
+    vPE:
+      type: cisco.nodes.nfv.Vdu.Compute
+      properties:
+        name: vPE
+        description: vPE
+        sw_image_data:
+          name: xrv9k-6.6.2
+          version: 1.0
+          checksum: bc760af3d05efa5716407471a5e1dd8d
+          container_format: bare
+          disk_format: qcow2
+          min_disk: 0
+          size: 1426587648 MB
+        configurable_properties:
+          additional_vnfc_configurable_properties:
+            vim_flavor: xrv9k
+            bootup_time: 900
+        vdu_profile:
+          min_number_of_instances: 1
+          max_number_of_instances: 1
+        kpi_data:
+          VM_ALIVE:
+            event_name: 'VM_ALIVE'
+            metric_value: 1
+            metric_cond: 'GT'
+            metric_type: 'UINT32'
+            metric_occurrences_true: 3
+            metric_occurrences_false: 3
+            metric_collector:
+              type: 'ICMPPING'
+              nicid: 0
+              address_id: 0
+              poll_frequency: 5
+              polling_unit: 'seconds'
+              continuous_alarm: true
+        admin_rules:
+          VM_ALIVE:
+            event_name: 'VM_ALIVE'
+            action:
+              - 'ALWAYS log'
+              - 'FALSE recover autohealing'
+              - 'TRUE servicebooted.sh'
+        vendor_section:
+          cisco_esc:
+            config_data:
+              iosxr_config.txt:
+                file: ../Files/Scripts/vPE/basic-bench.cfg
+                variables:
+                  HOSTNAME: xrv-bench
+                  USERNAME: root
+                  PASSWORD: cisco
+                  DOMAIN_NAME: cisco.com
+                  NAME_SERVER: 144.254.71.184
+                  BENCH_SUBNET_LFFT: 10.0.0.0/8
+                  TG_GATAWAY_LEFT: 10.1.3.100
+                  BENCH_SUBNET_RIGHT: 20.0.0.0/8
+                  TG_GATEWAY_RIGHT: 10.1.4.100
+      capabilities:
+        virtual_compute:
+          properties:
+            virtual_cpu:
+              num_virtual_cpu: 4
+            virtual_memory:
+              virtual_mem_size: 16384MB
+      artifacts:
+        sw_image:
+          file: '../Files/xrv9k-6.6.2.qcow'
+          type: tosca.datatypes.nfv.SwImageData
+##################################################
+# Connection points for "vPE"                    #
+##################################################
+    vPE_nic0:
+      type: cisco.nodes.nfv.VduCp
+      properties:
+        layer_protocols: [ ipv4 ]
+        protocol:
+          - associated_layer_protocol: ipv4
+        trunk_mode: false
+        order: 0
+        management: true
+        iface_type: virtual
+      requirements:
+        - virtual_binding: vPE
+    vPE_nic1:
+      type: cisco.nodes.nfv.VduCp
+      properties:
+        layer_protocols: [ ipv4 ]
+        protocol:
+          - associated_layer_protocol: ipv4
+        trunk_mode: false
+        order: 1
+        management: false
+        iface_type: virtual
+      requirements:
+        - virtual_binding: vPE
+        - virtual_link: vl-network-xrv-unused
+    vPE_nic2:
+      type: cisco.nodes.nfv.VduCp
+      properties:
+        layer_protocols: [ ipv4 ]
+        protocol:
+          - associated_layer_protocol: ipv4
+        trunk_mode: false
+        order: 2
+        management: false
+        iface_type: virtual
+      requirements:
+        - virtual_binding: vPE
+        - virtual_link: vl-network-xrv-host
+    vPE_nic3:
+      type: cisco.nodes.nfv.VduCp
+      properties:
+        layer_protocols: [ ipv4 ]
+        protocol:
+          - associated_layer_protocol: ipv4
+        trunk_mode: false
+        order: 3
+        management: false
+        allowed_address_pairs:
+          - ip_address: 0.0.0.0/0
+        iface_type: virtual
+      requirements:
+        - virtual_binding: vPE
+        - virtual_link: vl-network-xrv-eth0
+    vPE_nic4:
+      type: cisco.nodes.nfv.VduCp
+      properties:
+        layer_protocols: [ ipv4 ]
+        protocol:
+          - associated_layer_protocol: ipv4
+        trunk_mode: false
+        order: 4
+        management: false
+        allowed_address_pairs:
+          - ip_address: 0.0.0.0/0
+        iface_type: virtual
+      requirements:
+        - virtual_binding: vPE
+        - virtual_link: vl-network-xrv-eth1
+##################################################
+# Internal Virtual Links Configuration           #
+##################################################
+    vl-network-xrv-unused:
+      type: tosca.nodes.nfv.VnfVirtualLink
+      properties:
+        connectivity_type:
+          layer_protocols: [ ipv4 ]
+        description: Internal VL Network network-xrv-unused
+        vl_profile:
+          max_bitrate_requirements:
+            root: 100000
+          min_bitrate_requirements:
+            root: 0
+          virtual_link_protocol_data:
+            - associated_layer_protocol: ipv4
+              l3_protocol_data:
+                ip_version: ipv4
+                cidr: 10.1.1.0/24
+                dhcp_enabled: true
+    vl-network-xrv-host:
+      type: tosca.nodes.nfv.VnfVirtualLink
+      properties:
+        connectivity_type:
+          layer_protocols: [ ipv4 ]
+        description: Internal VL Network network-xrv-host
+        vl_profile:
+          max_bitrate_requirements:
+            root: 100000
+          min_bitrate_requirements:
+            root: 0
+          virtual_link_protocol_data:
+            - associated_layer_protocol: ipv4
+              l3_protocol_data:
+                ip_version: ipv4
+                cidr: 10.1.2.0/24
+                dhcp_enabled: true
+    vl-network-xrv-eth0:
+      type: tosca.nodes.nfv.VnfVirtualLink
+      properties:
+        connectivity_type:
+          layer_protocols: [ ipv4 ]
+        description: Internal VL Network network-xrv-eth0
+        vl_profile:
+          max_bitrate_requirements:
+            root: 100000
+          min_bitrate_requirements:
+            root: 0
+          virtual_link_protocol_data:
+            - associated_layer_protocol: ipv4
+              l3_protocol_data:
+                ip_version: ipv4
+                cidr: 10.1.3.0/24
+                dhcp_enabled: true
+    vl-network-xrv-eth1:
+      type: tosca.nodes.nfv.VnfVirtualLink
+      properties:
+        connectivity_type:
+          layer_protocols: [ ipv4 ]
+        description: Internal VL Network network-xrv-eth1
+        vl_profile:
+          max_bitrate_requirements:
+            root: 100000
+          min_bitrate_requirements:
+            root: 0
+          virtual_link_protocol_data:
+            - associated_layer_protocol: ipv4
+              l3_protocol_data:
+                ip_version: ipv4
+                cidr: 10.1.4.0/24
+                dhcp_enabled: true
+##################################################
+# Policies                                       #
+##################################################
+  policies:
+    - scaling_aspects:
+        type: tosca.policies.nfv.ScalingAspects
+        properties:
+          aspects:
+            vPE_scaling_aspect:
+              name: 'vPE_scaling_aspect'
+              description: 'Scaling aspect for VDU vPE.'
+              max_scale_level: 0
+              step_deltas:
+                - delta_1
+    - instantiation_levels:
+        type: tosca.policies.nfv.InstantiationLevels
+        properties:
+          levels:
+            default:
+              description: 'Default instantiation level'
+              scale_info:
+                vPE_scaling_aspect:
+                  scale_level: 0
+          default_level: default
+##################################################
+# Policy VDU [vPE]                               #
+##################################################
+    - vPE_initial_delta:
+        type: tosca.policies.nfv.VduInitialDelta
+        properties:
+          initial_delta:
+            number_of_instances: 1
+        targets: [ vPE ]
+    - vPE_instantiation_levels:
+        type: tosca.policies.nfv.VduInstantiationLevels
+        properties:
+          levels:
+            default:
+              number_of_instances: 1
+        targets: [ vPE ]
+    - vPE_scaling_aspect_deltas:
+        type: tosca.policies.nfv.VduScalingAspectDeltas
+        properties:
+          aspect: vPE_scaling_aspect
+          deltas:
+            delta_1:
+              number_of_instances: 1
+        targets: [ vPE ]
