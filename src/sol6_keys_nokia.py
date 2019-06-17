@@ -1,5 +1,5 @@
-from sol6_keys import *
-from list_utils import *
+from .sol6_keys import *
+from .list_utils import *
 
 
 class TOSCA(TOSCA_BASE):
