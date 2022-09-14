@@ -52,11 +52,9 @@ topology_template:
           modifiable_attributes:
             extensions:
               cgn_host_name:
-                default: UHN3tld1f5cg0000
               abr_host_name:
-                default: UHN3tld1f5ab0000
               vnf_name:
-                default: UHN3tld1f501
+                default: 
               bigip_admin_pwd:
                 default: admin
               bigip_root_pwd:
@@ -64,7 +62,7 @@ topology_template:
               bigip_default_gateway:
                 default: "2a00:8a00:a0ff::3e7f"
               bigip_domain_name:
-                default: rmn.local
+                default: 
               bigip_servers_dns:
                 default:
                   - 2a00:8a00:a0ff::41
